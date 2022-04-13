@@ -5,7 +5,7 @@ import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import morgan from 'morgan';
-import { connect, set } from 'mongoose';
+import { set } from 'mongoose';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
@@ -48,18 +48,23 @@ class App {
     if (this.env !== 'production') {
       set('debug', true);
     }
-
     connectDB();
   }
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
     this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
-    this.app.use(hpp());
-    this.app.use(helmet());
-    this.app.use(compression());
-    this.app.use(express.json());
+    // Enable access to urlencoded payload
     this.app.use(express.urlencoded({ extended: true }));
+    // Enable access to JSON payload
+    this.app.use(express.json());
+    // Protection against HTTP Parameter Pollution attacks
+    this.app.use(hpp());
+    // Protection against security risks like XSS, Content Security Policy
+    this.app.use(helmet());
+    // Decreases the downloadable amount of data that's served to users.
+    this.app.use(compression());
+    // Enable access to cookie from request or response object
     this.app.use(cookieParser());
   }
 
