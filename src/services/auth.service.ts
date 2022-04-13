@@ -7,30 +7,17 @@ import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import userModel from '@models/users.model';
 import { isEmpty } from '@utils/util';
+import { LeanDocument } from 'mongoose';
 
 class AuthService {
-  public users = userModel;
-
-  public async signup(userData: CreateUserDto): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
-
-    const findUser: User = await this.users.findOne({ email: userData.email });
-    if (findUser) throw new HttpException(409, `You're email ${userData.email} already exists`);
-
-    const hashedPassword = await hash(userData.password, 10);
-    const createUserData: User = await this.users.create({ ...userData, password: hashedPassword });
-
-    return createUserData;
-  }
-
   public async login(userData: CreateUserDto): Promise<{ cookie: string; findUser: User }> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
+    if (isEmpty(userData)) throw new HttpException(400, 'Please provide the correct data.');
 
-    const findUser: User = await this.users.findOne({ email: userData.email });
-    if (!findUser) throw new HttpException(409, `You're email ${userData.email} not found`);
+    const findUser: LeanDocument<User> = await userModel.findOne({ email: userData.email }).lean();
+    if (!findUser) throw new HttpException(409, 'Invalid email');
 
     const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
-    if (!isPasswordMatching) throw new HttpException(409, "You're password not matching");
+    if (!isPasswordMatching) throw new HttpException(409, 'Invalid password.');
 
     const tokenData = this.createToken(findUser);
     const cookie = this.createCookie(tokenData);
@@ -38,16 +25,14 @@ class AuthService {
     return { cookie, findUser };
   }
 
-  public async logout(userData: User): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
+  public async logout(userData: User): Promise<void> {
+    if (isEmpty(userData)) throw new HttpException(400, 'Invalid token.');
 
-    const findUser: User = await this.users.findOne({ email: userData.email, password: userData.password });
-    if (!findUser) throw new HttpException(409, `You're email ${userData.email} not found`);
-
-    return findUser;
+    const findUser: LeanDocument<User> = await userModel.findOne({ email: userData.email, password: userData.password }).lean();
+    if (!findUser) throw new HttpException(409, 'Invalid token');
   }
 
-  public createToken(user: User): TokenData {
+  protected createToken(user: User): TokenData {
     const dataStoredInToken: DataStoredInToken = { _id: user._id };
     const secretKey: string = SECRET_KEY;
     const expiresIn: number = 60 * 60;
@@ -55,7 +40,7 @@ class AuthService {
     return { expiresIn, token: sign(dataStoredInToken, secretKey, { expiresIn }) };
   }
 
-  public createCookie(tokenData: TokenData): string {
+  protected createCookie(tokenData: TokenData): string {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn};`;
   }
 }
