@@ -9,7 +9,7 @@ const userSchema = new Schema<User>(
     password: { type: String, required: [true, 'Password is required'] },
 
     role: { type: String, required: [true, 'Role is required'], enum: ['member', 'admin', 'staff'] },
-    school_id: { type: String, required: false }, // Include if role is member of staff
+    school_id: { type: String, required: [true, 'School id is required'], unique: true },
 
     birthday: { type: Date, required: [true, 'Birthday is required'] },
     cellNumber: { type: String, required: [true, 'Password is required'] },
