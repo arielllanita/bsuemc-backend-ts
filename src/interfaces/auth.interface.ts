@@ -1,8 +1,9 @@
 import { Request } from 'express';
 import { User } from '@interfaces/users.interface';
+import { Types } from 'mongoose';
 
 export interface DataStoredInToken {
-  _id: string;
+  _id: string | Types.ObjectId;
 }
 
 export interface TokenData {
