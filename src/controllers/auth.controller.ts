@@ -6,8 +6,8 @@ import { LoginDto } from '@/dtos/auth.dto';
 
 class AuthController {
   public readonly authService = new AuthService();
-  
-    public async logIn (req: Request, res: Response, next: NextFunction) {
+
+  public logIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userData: LoginDto = req.body;
       const { cookie, findUser } = await this.authService.login(userData);
@@ -19,7 +19,7 @@ class AuthController {
     }
   };
 
-    public async logOut (req: RequestWithUser, res: Response, next: NextFunction) {
+  public logOut = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const userData: User = req.user;
       await this.authService.logout(userData);
