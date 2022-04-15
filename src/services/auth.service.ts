@@ -25,13 +25,6 @@ class AuthService {
     return { cookie, findUser };
   }
 
-  public async logout(userData: User): Promise<void> {
-    if (isEmpty(userData)) throw new HttpException(400, 'Invalid token.');
-
-    const findUser: LeanDocument<User> = await userModel.findOne({ email: userData.email, password: userData.password }).lean();
-    if (!findUser) throw new HttpException(409, 'Invalid token');
-  }
-
   protected createToken(user: User): TokenData {
     const dataStoredInToken: DataStoredInToken = { _id: user._id };
     const secretKey: string = SECRET_KEY;
