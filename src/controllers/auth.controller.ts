@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { RequestHandler } from 'express';
 import { RequestWithUser } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import AuthService from '@services/auth.service';
@@ -7,7 +7,7 @@ import { LoginDto } from '@/dtos/auth.dto';
 class AuthController {
   public readonly authService = new AuthService();
 
-  public logIn = async (req: Request, res: Response, next: NextFunction) => {
+  public logIn: RequestHandler = async (req, res, next) => {
     try {
       const userData: LoginDto = req.body;
       const { cookie, findUser } = await this.authService.login(userData);
@@ -19,13 +19,22 @@ class AuthController {
     }
   };
 
-  public logOut = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  public logOut: RequestHandler = async (req: RequestWithUser, res, next) => {
     try {
       const userData: User = req.user;
       await this.authService.logout(userData);
 
       res.setHeader('Set-Cookie', ['Authorization=; Max-age=0']);
       res.status(200).json({ message: 'Logout successfully' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public verifyJwt: RequestHandler = (req: RequestWithUser, res, next) => {
+    try {
+      const userData: User = req.user;
+      res.status(200).json({ data: userData, message: 'Verify jwt' });
     } catch (error) {
       next(error);
     }
