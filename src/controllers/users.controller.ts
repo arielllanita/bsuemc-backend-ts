@@ -1,12 +1,15 @@
-import { NextFunction, Request, Response } from 'express';
-import { CreateUserDto } from '@dtos/users.dto';
+import { RequestHandler } from 'express';
+import { UserDto } from '@dtos/users.dto';
 import { User } from '@interfaces/users.interface';
-import userService from '@services/users.service';
+import UserService from '@services/users.service';
 
 class UsersController {
-  public readonly userService = new userService();
+  public readonly userService = new UserService();
 
-  public getUsers = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * @description Retrieves all users
+   */
+  public getUsers: RequestHandler = async (req, res, next) => {
     try {
       const findAllUsersData: User[] = await this.userService.findAllUser();
 
@@ -16,7 +19,10 @@ class UsersController {
     }
   };
 
-  public getUserById = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * @description Gets user by ID
+   */
+  public getUserById: RequestHandler = async (req, res, next) => {
     try {
       const userId: string = req.params.id;
       const findOneUserData: User = await this.userService.findUserById(userId);
@@ -27,9 +33,26 @@ class UsersController {
     }
   };
 
-  public createUser = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * @description Retrieve user by role
+   */
+  public getUserByRole: RequestHandler = async (req, res, next) => {
     try {
-      const userData: CreateUserDto = req.body;
+      const role: string = req.params.role;
+      const users: User[] = await this.userService.findUserByRole(role);
+
+      res.status(200).json({ data: users, message: 'user by role' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * @description Create user
+   */
+  public createUser: RequestHandler = async (req, res, next) => {
+    try {
+      const userData: User = req.body;
       const createUserData: User = await this.userService.createUser(userData);
 
       res.status(201).json({ data: createUserData, message: 'created' });
@@ -38,10 +61,13 @@ class UsersController {
     }
   };
 
-  public updateUser = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * @description Update user data
+   */
+  public updateUser: RequestHandler = async (req, res, next) => {
     try {
       const userId: string = req.params.id;
-      const userData: CreateUserDto = req.body;
+      const userData: UserDto = req.body;
       const updateUserData: User = await this.userService.updateUser(userId, userData);
 
       res.status(200).json({ data: updateUserData, message: 'updated' });
@@ -50,7 +76,10 @@ class UsersController {
     }
   };
 
-  public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * @description Delete user
+   */
+  public deleteUser: RequestHandler = async (req, res, next) => {
     try {
       const userId: string = req.params.id;
       const deleteUserData: User = await this.userService.deleteUser(userId);

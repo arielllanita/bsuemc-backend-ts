@@ -7,7 +7,10 @@ GET {{ baseURL }}/users
 
 ###
 # Find User By Id
-GET {{ baseURL }}/users/1
+GET {{ baseURL }}/users/625826dc76726739c5cbaaff
+
+###
+GET {{baseURL}}/users/staff/role
 
 ###
 # Create User
@@ -15,8 +18,18 @@ POST {{ baseURL }}/users
 Content-Type: application/json
 
 {
-    "email": "example@email.com",
-    "password": "password"
+    "firstname": "Ariel",
+    "lastname": "Llanita",
+    "email": "admin@test.com",
+    "password": "password",
+    "role": "admin",
+    "school_id": "1801102199",
+    "birthday": "Sept 17 1999",
+    "cellNumber": "09978276641",
+    "province": "Misamis Oriental",
+    "city": "Cagayan de Oro",
+    "barangay": "Puntod",
+    "profile_photo": "lsdkfjsdofiu"
 }
 
 ###
@@ -25,7 +38,7 @@ PUT {{ baseURL }}/users/1
 Content-Type: application/json
 
 {
-    "email": "example@email.com",
+    "email": "member@test.com",
     "password": "password"
 }
 

@@ -2,7 +2,7 @@
 @baseURL = http://localhost:3000
 
 ###
-# User Signup
+# User SIGNUP
 POST {{ baseURL }}/signup
 Content-Type: application/json
 
@@ -12,21 +12,22 @@ Content-Type: application/json
 }
 
 ###
-# User Login
+# User LOGIN
 POST {{ baseURL }}/login
 Content-Type: application/json
 
 {
-    "email": "example@email.com",
+    "email": "member@test.com",
     "password": "password"
 }
 
 ###
-# User Logout
+# User LOGOUT
 POST {{ baseURL }}/logout
 Content-Type: application/json
+Cookie: Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MjZkYzc2NzI2NzM5YzVjYmFhZmYiLCJpYXQiOjE2NTAwMTA4MjEsImV4cCI6MTY1MDAxNDQyMX0.Jw2JZxYtswZ8VBd2JFUscLevOK5plvUc_XGxXEOjy5E; HttpOnly; Max-Age=3600;
 
-{
-    "email": "example@email.com",
-    "password": "password"
-}
+###
+# Verify JWT
+GET {{baseURL}}/verify-jwt HTTP/1.1
+Cookie: Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MjZkYzc2NzI2NzM5YzVjYmFhZmYiLCJpYXQiOjE2NTAwMTA4MjEsImV4cCI6MTY1MDAxNDQyMX0.Jw2JZxYtswZ8VBd2JFUscLevOK5plvUc_XGxXEOjy5E; HttpOnly; Max-Age=3600;
