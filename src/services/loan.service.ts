@@ -1,5 +1,5 @@
 import loanModel from '@/models/loan.model';
-import { Loan } from '@interfaces/loan.interface';
+// import { Loan } from '@interfaces/loan.interface';
 
 class LoanService {
   public async apply_loan(files: any, texts: any) {
@@ -18,13 +18,13 @@ class LoanService {
     return doc;
   }
 
-  public async approve_loan(loanID: string) {
-    const doc = await loanModel.findByIdAndUpdate(loanID, { $set: { isApproved: true, isPending: false } });
+  public async approve_loan(loanID: string, officerID: string | any) {
+    const doc = await loanModel.findByIdAndUpdate(loanID, { $set: { isApproved: true, isPending: false, transactBy: officerID } });
     return doc;
   }
 
-  public async reject_loan(loanID: string) {
-    const doc = await loanModel.findByIdAndUpdate(loanID, { $set: { isApproved: false, isPending: false } });
+  public async reject_loan(loanID: string, officerID: string | any) {
+    const doc = await loanModel.findByIdAndUpdate(loanID, { $set: { isApproved: false, isPending: false, transactBy: officerID } });
     return doc;
   }
 

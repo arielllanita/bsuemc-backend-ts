@@ -14,8 +14,10 @@ class LoanRoute implements Routes {
   }
 
   private initializeRoutes() {
-    // this.router.all(`${this.path}`, authMiddleware).post('/apply', uploadDocs.array('docs'), this.loanController.applyLoan);
+    this.router.get(`${this.path}`, authMiddleware, this.loanController.showPendingLoans);
     this.router.post(`${this.path}/apply`, authMiddleware, uploadDocs.array('docs'), this.loanController.applyLoan);
+    this.router.put(`${this.path}/approve/:id`, authMiddleware, this.loanController.approveLoan);
+    this.router.put(`${this.path}/reject/:id`, authMiddleware, this.loanController.rejectLoan);
   }
 }
 

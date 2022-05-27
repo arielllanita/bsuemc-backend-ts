@@ -8,4 +8,5 @@ export interface Loan {
   createdAt?: string;
   isApproved: boolean;
   isPending: boolean;
+  transactBy: string | Types.ObjectId;
 }
