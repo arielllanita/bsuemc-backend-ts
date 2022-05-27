@@ -13,6 +13,7 @@ import { connectDB } from '@databases';
 import { Routes } from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
+import path from 'path';
 
 class App {
   public app: express.Application;
@@ -22,7 +23,7 @@ class App {
   constructor(routes: Routes[]) {
     this.app = express();
     this.env = NODE_ENV || 'development';
-    this.port = PORT || 3000;
+    this.port = PORT || 8080;
 
     this.connectToDatabase();
     this.initializeMiddlewares();
@@ -54,6 +55,8 @@ class App {
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
     this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
+    // Document upload directory
+    this.app.use('/uploads', express.static(path.join(__dirname, '../', 'uploads')));
     // Enable access to urlencoded payload
     this.app.use(express.urlencoded({ extended: true }));
     // Enable access to JSON payload

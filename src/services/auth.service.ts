@@ -10,7 +10,7 @@ import { LeanDocument } from 'mongoose';
 import { LoginDto } from '@/dtos/auth.dto';
 
 class AuthService {
-  public async login(userData: LoginDto): Promise<{ cookie: string; findUser: User }> {
+  public async login(userData: LoginDto): Promise<{ cookie: string; findUser: User; token: string }> {
     if (isEmpty(userData)) throw new HttpException(400, 'Please provide the correct data.');
 
     const findUser: LeanDocument<User> = await userModel.findOne({ email: userData.email }).lean();
@@ -22,7 +22,7 @@ class AuthService {
     const tokenData = this.createToken(findUser);
     const cookie = this.createCookie(tokenData);
 
-    return { cookie, findUser };
+    return { cookie, findUser, token: tokenData.token };
   }
 
   protected createToken(user: User): TokenData {
