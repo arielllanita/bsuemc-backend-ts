@@ -1,5 +1,5 @@
 # baseURL
-@baseURL = http://localhost:3000
+@baseURL = http://localhost:8080
 
 ###
 # Find All Users
@@ -16,14 +16,15 @@ GET {{baseURL}}/users/staff/role
 # Create User
 POST {{ baseURL }}/users
 Content-Type: application/json
+Cookie: Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MjZkYzc2NzI2NzM5YzVjYmFhZmYiLCJpYXQiOjE2NTM2NDYyOTUsImV4cCI6MTY1MzY0OTg5NX0.ebyLx0VMTJbOkzbqE__zkEir2jECauh5requKmTvVSM; HttpOnly; Max-Age=3600; Domain=localhost
 
 {
     "firstname": "Ariel",
     "lastname": "Llanita",
-    "email": "admin@test.com",
+    "email": "admin4@test.com",
     "password": "password",
     "role": "admin",
-    "school_id": "1801102199",
+    "school_id": "1801102120",
     "birthday": "Sept 17 1999",
     "cellNumber": "09978276641",
     "province": "Misamis Oriental",

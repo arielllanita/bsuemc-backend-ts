@@ -34,7 +34,7 @@ class AuthService {
   }
 
   protected createCookie(tokenData: TokenData): string {
-    return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn};`;
+    return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}; Domain=localhost; SameSite=None; Secure; Path=/;`;
   }
 }
 

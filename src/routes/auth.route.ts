@@ -6,7 +6,7 @@ import validationMiddleware from '@middlewares/validation.middleware';
 import { LoginDto } from '@/dtos/auth.dto';
 
 class AuthRoute implements Routes {
-  public path = '/';
+  public path = '/auth';
   public router = Router();
   public authController = new AuthController();
 
@@ -15,9 +15,9 @@ class AuthRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.post(`${this.path}login`, validationMiddleware(LoginDto, 'body'), this.authController.logIn);
-    this.router.post(`${this.path}logout`, authMiddleware, this.authController.logOut);
-    this.router.get(`${this.path}verify-jwt`, authMiddleware, this.authController.verifyJwt);
+    this.router.post(`${this.path}/login`, validationMiddleware(LoginDto, 'body', true, false, false), this.authController.logIn);
+    this.router.post(`${this.path}/logout`, authMiddleware, this.authController.logOut);
+    this.router.get(`${this.path}/verify-jwt`, authMiddleware, this.authController.verifyJwt);
   }
 }
 
