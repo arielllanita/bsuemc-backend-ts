@@ -2,6 +2,56 @@ import loanModel from '@/models/loan.model';
 // import { Loan } from '@interfaces/loan.interface';
 
 class LoanService {
+  public async show_rejected_loans() {
+    const rejectedLoans = await loanModel.aggregate([
+      { $match: { isPending: false, isApproved: false } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'applicant',
+          foreignField: '_id',
+          as: 'applicant',
+        },
+      },
+      { $unwind: '$applicant' },
+      {
+        $group: {
+          _id: '$type',
+          total: { $count: {} },
+          label: { $first: '$label' },
+          applicant: { $push: '$applicant' },
+        },
+      },
+    ]);
+
+    return rejectedLoans;
+  }
+
+  public async show_approved_loans() {
+    const approvedLoans = await loanModel.aggregate([
+      { $match: { isPending: false, isApproved: true } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'applicant',
+          foreignField: '_id',
+          as: 'applicant',
+        },
+      },
+      { $unwind: '$applicant' },
+      {
+        $group: {
+          _id: '$type',
+          total: { $count: {} },
+          label: { $first: '$label' },
+          applicant: { $push: '$applicant' },
+        },
+      },
+    ]);
+
+    return approvedLoans;
+  }
+
   public async apply_loan(files: any, texts: any) {
     const docs = [];
     files.forEach(element => {

@@ -7,9 +7,27 @@ import { RequestHandler } from 'express';
 class LoanController {
   public readonly loanService = new LoanService();
 
+  public showRejectedLoans: RequestHandler = async (req, res, next) => {
+    try {
+      const rejectedLoans = await this.loanService.show_rejected_loans();
+      res.status(200).json({ data: rejectedLoans, message: 'List of rejected loans' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public showApprovedLoans: RequestHandler = async (req, res, next) => {
+    try {
+      const approvedLoans = await this.loanService.show_approved_loans();
+      res.status(200).json({ data: approvedLoans, message: 'List of approved loans' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public showPendingLoans: RequestHandler = async (req, res, next) => {
     try {
-      const loans = await loanModel.find({ isPending: true }).lean();
+      const loans = await loanModel.find({ isPending: true }).populate('applicant').lean();
       res.status(200).json({ data: loans, message: 'List of all pending loans' });
     } catch (error) {
       next(error);
