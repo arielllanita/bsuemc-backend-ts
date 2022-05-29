@@ -13,7 +13,6 @@ class AuthController {
       const { findUser, token, cookie } = await this.authService.login(userData);
 
       res.setHeader('Set-Cookie', [cookie]);
-      // res.cookie('Authorization', token, { domain: 'localhost', httpOnly: true, sameSite: 'strict' });
       res.status(200).json({ data: findUser, token, message: 'Login successfully!' });
     } catch (error) {
       next(error);
@@ -22,7 +21,7 @@ class AuthController {
 
   public logOut: RequestHandler = async (req, res, next) => {
     try {
-      res.setHeader('Set-Cookie', ['Authorization=; Max-age=0']);
+      res.setHeader('Set-Cookie', ['Authorization=; Max-age=0; Domain=localhost; SameSite=None; Secure; Path=/;']);
       res.status(200).json({ message: 'Logout successfully' });
     } catch (error) {
       next(error);

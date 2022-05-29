@@ -9,6 +9,7 @@ const loanSchema = new Schema<Loan>(
     docs: [],
     type: { type: String, required: true },
     transactBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+    label: { type: String, required: true },
   },
   {
     timestamps: true,

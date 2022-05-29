@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     cb(null, directory);
   },
   filename: (req: RequestWithUser, file, cb) => {
-    const dateTime = format(new Date(), 'MMM-dd-yyyy-hh-mm-aa');
+    const dateTime = format(new Date(), 'MMM-dd-yyyy-hh-mm-ss-aa');
     const userID = req.user._id;
     const fileName = file.originalname;
     cb(null, `${dateTime}-${userID}-${fileName}`);
