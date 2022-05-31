@@ -7,6 +7,7 @@ const userSchema = new Schema<User>(
     lastname: { type: String, required: true },
     email: { type: String, required: [true, 'Email is required'], unique: true },
     password: { type: String, required: [true, 'Password is required'] },
+    isDeactivated: { type: Boolean, default: false },
 
     role: { type: String, required: [true, 'Role is required'], enum: ['member', 'admin', 'staff'] },
     school_id: { type: String, required: [true, 'School id is required'], unique: true },

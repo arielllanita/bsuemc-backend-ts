@@ -89,6 +89,17 @@ class UsersController {
       next(error);
     }
   };
+
+  public re_activate_user: RequestHandler = async (req, res, next) => {
+    try {
+      const userId: string = req.params.id;
+      const userData: User = await this.userService.reActivateUser(userId);
+
+      res.status(200).json({ data: userData, message: 're-activate user' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default UsersController;

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Routes } from '@interfaces/routes.interface';
 import authMiddleware from '@middlewares/auth.middleware';
-import { uploadDocs } from '@/utils/upload';
+import { uploadDocs } from '@/utils/uploadDocs';
 import LoanController from '@/controllers/loan.controller';
 
 class LoanRoute implements Routes {

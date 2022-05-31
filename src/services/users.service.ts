@@ -7,15 +7,15 @@ import { isEmpty } from '@utils/util';
 import { LeanDocument } from 'mongoose';
 
 class UserService {
-  public async findAllUser(role?: string): Promise<User[]> {
-    const users: LeanDocument<User[]> = await userModel.find(role && { role }).lean();
+  public async findAllUser(): Promise<User[]> {
+    const users: LeanDocument<User[]> = await userModel.find({}).lean();
     return users;
   }
 
   public async findUserById(userId: string): Promise<User> {
     if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
 
-    const findUser: LeanDocument<User> = await userModel.findOne({ _id: userId }).lean();
+    const findUser: LeanDocument<User> = await userModel.findOne({ _id: userId, isDeactivated: false }).lean();
     if (!findUser) throw new HttpException(409, "You're not user");
 
     return findUser;
@@ -24,7 +24,7 @@ class UserService {
   public async findUserByRole(role: string): Promise<User[]> {
     if (isEmpty(role)) throw new HttpException(400, 'Invalid role');
 
-    const users: LeanDocument<User[]> = await userModel.find({ role }).lean();
+    const users: LeanDocument<User[]> = await userModel.find({ role, isDeactivated: false }).lean();
     return users;
   }
 
@@ -53,17 +53,24 @@ class UserService {
       userData = { ...userData, password: hashedPassword };
     }
 
-    const updateUserById: LeanDocument<User> = await userModel.findByIdAndUpdate(userId, { userData }).lean();
+    const updateUserById: LeanDocument<User> = await userModel.findByIdAndUpdate(userId, { $set: { ...userData } }).lean();
     if (!updateUserById) throw new HttpException(409, "You're not user");
 
     return updateUserById;
   }
 
   public async deleteUser(userId: string): Promise<User> {
-    const deleteUserById: LeanDocument<User> = await userModel.findByIdAndDelete(userId).lean();
+    const deleteUserById: LeanDocument<User> = await userModel.findByIdAndUpdate(userId, { $set: { isDeactivated: true } }).lean();
     if (!deleteUserById) throw new HttpException(409, "You're not user");
 
     return deleteUserById;
+  }
+
+  public async reActivateUser(userId: string): Promise<User> {
+    const activateUserById: LeanDocument<User> = await userModel.findByIdAndUpdate(userId, { $set: { isDeactivated: false } }).lean();
+    if (!activateUserById) throw new HttpException(409, "You're not user");
+
+    return activateUserById;
   }
 }
 

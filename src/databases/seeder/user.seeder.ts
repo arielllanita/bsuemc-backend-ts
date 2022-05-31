@@ -6,7 +6,7 @@ import userModel from '../../models/users.model';
 mongoose
   .connect(`mongodb://localhost:27017/bsu_emc`)
   .then(() => console.log('ESTABLISHED CONNECTION TO DB...'))
-  .catch(err => console.log('SEEDING FAILED', err));
+  .catch(err => console.log('DB CONNECTION FAILED', err));
 
 const roles = ['admin', 'staff', 'member'];
 
@@ -17,7 +17,7 @@ const userDummyData = [...new Array(3)].map((_, i) => {
   const data = {
     firstname: firstName,
     lastname: lastName,
-    email: faker.internet.email(firstName, lastName, 'student.buksu.edu.ph'),
+    email: faker.internet.email(firstName, lastName, 'gmail.com'),
     password: '$2b$10$Lpn/eACuyddtK5Uc3wx54uQ25VglIUiLWma/YDc6W50AqYe3QrNri', // password (in normal text)
     role: roles[i],
     school_id: faker.random.numeric(10),

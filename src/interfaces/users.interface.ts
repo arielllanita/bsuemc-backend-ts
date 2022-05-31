@@ -6,6 +6,7 @@ export interface User {
   lastname: string;
   email: string;
   password: string;
+  isDeactivated: boolean;
   role: 'member' | 'admin' | 'staff';
   school_id?: string; // Include if role is member or staff
   birthday: Date;
