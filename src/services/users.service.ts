@@ -28,14 +28,14 @@ class UserService {
     return users;
   }
 
-  public async createUser(userData: User): Promise<User> {
+  public async createUser(userData: User, profile_photo: any): Promise<User> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
 
     const findUser: LeanDocument<User> = await userModel.findOne({ email: userData.email }).lean();
     if (findUser) throw new HttpException(409, `You're email ${userData.email} already exists`);
 
     const hashedPassword = await hash(userData.password, 10);
-    const createUserData: User = await userModel.create({ ...userData, password: hashedPassword });
+    const createUserData: User = await userModel.create({ ...userData, password: hashedPassword, profile_photo });
 
     return createUserData;
   }

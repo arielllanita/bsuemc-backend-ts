@@ -53,7 +53,8 @@ class UsersController {
   public createUser: RequestHandler = async (req, res, next) => {
     try {
       const userData: User = req.body;
-      const createUserData: User = await this.userService.createUser(userData);
+      const profile_photo: any = req.file.path;
+      const createUserData: User = await this.userService.createUser(userData, profile_photo);
 
       res.status(201).json({ data: createUserData, message: 'created' });
     } catch (error) {
