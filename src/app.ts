@@ -8,7 +8,7 @@ import morgan from 'morgan';
 import { set } from 'mongoose';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { NODE_ENV, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
+import { NODE_ENV, LOG_FORMAT, CORS_CONFIG } from '@config';
 import { connectDB } from '@databases';
 import { Routes } from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
@@ -53,7 +53,7 @@ class App {
   }
 
   private initializeMiddlewares() {
-    this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
+    this.app.use(cors(CORS_CONFIG));
     this.app.use(morgan(LOG_FORMAT, { stream }));
     // Document upload directory
     this.app.use('/uploads', express.static(path.join(__dirname, '../', 'uploads')));
