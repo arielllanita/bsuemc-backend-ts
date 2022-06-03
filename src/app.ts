@@ -8,7 +8,7 @@ import morgan from 'morgan';
 import { set } from 'mongoose';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
+import { NODE_ENV, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
 import { connectDB } from '@databases';
 import { Routes } from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
@@ -22,8 +22,8 @@ class App {
 
   constructor(routes: Routes[]) {
     this.app = express();
-    this.env = NODE_ENV || 'development';
-    this.port = PORT || 8080;
+    this.env = NODE_ENV;
+    this.port = process.env.PORT || 8080;
 
     this.connectToDatabase();
     this.initializeMiddlewares();

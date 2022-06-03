@@ -1,5 +1,20 @@
-import { config } from 'dotenv';
-config({ path: `.env.${process.env.NODE_ENV || 'development'}.local` });
+const isProduction = process.env.NODE_ENV === 'production ';
 
-export const CREDENTIALS = process.env.CREDENTIALS === 'true';
-export const { NODE_ENV, PORT, DB_HOST, DB_PORT, DB_DATABASE, SECRET_KEY, LOG_FORMAT, LOG_DIR, ORIGIN } = process.env;
+// DATABASE
+export const DB_URI = isProduction
+  ? 'mongodb+srv://ariel:4udeu9iq6uj3IBDv@capstone.6bmo6he.mongodb.net/bsu-emc?retryWrites=true&w=majority'
+  : 'mongodb://localhost:27017/bsu_emc';
+
+// CORS
+export const ORIGIN = isProduction ? 'https://bsuemc.netlify.app' : 'http://localhost:3000';
+export const CREDENTIALS = true;
+
+// LOG
+export const LOG_FORMAT = isProduction ? 'combined' : 'dev';
+export const LOG_DIR = '../logs';
+
+// TOKEN
+export const TOKEN = 'technogeekssecretkeyforjwt';
+
+// NODE ENVIRONMENT
+export const NODE_ENV = isProduction ? 'production' : 'development';
