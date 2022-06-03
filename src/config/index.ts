@@ -6,7 +6,7 @@ export const DB_URI = isProduction
   : 'mongodb://localhost:27017/bsu_emc';
 
 // CORS
-export const ORIGIN = isProduction ? 'https://bsuemc.netlify.app' : 'http://localhost:3000';
+export const ORIGIN = ['https://bsuemc.netlify.app', 'http://localhost:3000'];
 export const CREDENTIALS = true;
 
 // LOG
