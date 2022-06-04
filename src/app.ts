@@ -57,8 +57,6 @@ class App {
     this.app.use(morgan(LOG_FORMAT, { stream }));
     // Document upload directory
     this.app.use('/uploads', express.static(path.join(__dirname, '../', 'uploads')));
-    // Enable access to urlencoded payload
-    this.app.use(express.urlencoded({ extended: true }));
     // Enable access to JSON payload
     this.app.use(express.json());
     // Protection against HTTP Parameter Pollution attacks
