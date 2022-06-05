@@ -10,14 +10,16 @@ import { LeanDocument } from 'mongoose';
 import { LoginDto } from '@/dtos/auth.dto';
 
 class AuthService {
-  public async login(userData: LoginDto): Promise<{ cookie: string; findUser: User; token: string }> {
+  public async login(userData: LoginDto, remainingAttempts: any): Promise<{ cookie: string; findUser: User; token: string }> {
     if (isEmpty(userData)) throw new HttpException(400, 'Please provide the correct data.');
 
     const findUser: LeanDocument<User> = await userModel.findOne({ email: userData.email }).lean();
     if (!findUser) throw new HttpException(409, 'Invalid email');
 
     const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
-    if (!isPasswordMatching) throw new HttpException(409, 'Invalid password.');
+    if (!isPasswordMatching) {
+      throw new HttpException(409, `Invalid password, ${+remainingAttempts + 1} remaining attempt(s)`);
+    }
 
     const tokenData = this.createToken(findUser);
     const cookie = this.createCookie(tokenData);

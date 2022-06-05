@@ -3,6 +3,7 @@ import { RequestWithUser } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import AuthService from '@services/auth.service';
 import { LoginDto } from '@/dtos/auth.dto';
+import { loginLimit } from '@/middlewares/loginLimit.middleware';
 
 class AuthController {
   public readonly authService = new AuthService();
@@ -10,7 +11,10 @@ class AuthController {
   public logIn: RequestHandler = async (req, res, next) => {
     try {
       const userData: LoginDto = req.body;
-      const { findUser, token, cookie } = await this.authService.login(userData);
+      const remainingLoginAttempts = req['rateLimit']?.remaining;
+      const { findUser, token, cookie } = await this.authService.login(userData, remainingLoginAttempts);
+
+      loginLimit.resetKey(req.ip);
 
       res.setHeader('Set-Cookie', [cookie]);
       res.status(200).json({ data: findUser, token, message: 'Login successfully!' });

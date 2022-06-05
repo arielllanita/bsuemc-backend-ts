@@ -21,7 +21,11 @@ export const LOG_FORMAT = isProduction ? 'combined' : 'dev';
 export const LOG_DIR = '../logs';
 
 // TOKEN
-export const TOKEN = 'technogeekssecretkeyforjwt';
+export const SECRET_KEY = 'technogeekssecretkeyforjwt';
 
 // NODE ENVIRONMENT
 export const NODE_ENV = isProduction ? 'production' : 'development';
+
+// GMAIL (inser gmail account here)
+export const GMAIL = '';
+export const GMAIL_PASSWORD = ''; // App Password here

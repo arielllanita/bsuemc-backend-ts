@@ -1,4 +1,7 @@
+import { HttpException } from '@/exceptions/HttpException';
 import loanModel from '@/models/loan.model';
+import userModel from '@/models/users.model';
+import { sendEmail } from '@/utils/mailer';
 // import { Loan } from '@interfaces/loan.interface';
 
 class LoanService {
@@ -70,7 +73,20 @@ class LoanService {
 
   public async approve_loan(loanID: string, officerID: string | any) {
     const doc = await loanModel.findByIdAndUpdate(loanID, { $set: { isApproved: true, isPending: false, transactBy: officerID } });
-    return doc;
+    if (!doc) throw new HttpException(409, 'Invalid Loan ID');
+
+    const user = await userModel.findById(doc.applicant).select('email');
+    sendEmail({
+      recipientEmail: user.email,
+      subject: 'Loan Approval 🎉',
+      text: `Good day we would like to inform you that your loan applicantion for ${doc.label} was successfully approved. \n\n- The Management`,
+    })
+      .then(() => {
+        return doc;
+      })
+      .catch(err => {
+        throw new HttpException(500, err?.message || 'Error occurred while sending email.');
+      });
   }
 
   public async reject_loan(loanID: string, officerID: string | any) {
