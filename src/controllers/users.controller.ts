@@ -69,7 +69,8 @@ class UsersController {
     try {
       const userId: string = req.params.id;
       const userData: UserDto = req.body;
-      const updateUserData: User = await this.userService.updateUser(userId, userData);
+      const profile_photo: string = req.file.path ? req.file.path : '';
+      const updateUserData: User = await this.userService.updateUser(userId, { ...userData, profile_photo });
 
       res.status(200).json({ data: updateUserData, message: 'updated' });
     } catch (error) {
