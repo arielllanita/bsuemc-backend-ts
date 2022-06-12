@@ -2,7 +2,7 @@ import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { SECRET_KEY } from '@config';
 import { HttpException } from '@exceptions/HttpException';
-import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
+import { DataStoredInToken } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import userModel from '@models/users.model';
 import { isEmpty } from '@utils/util';
@@ -24,19 +24,21 @@ class AuthService {
     const tokenData = this.createToken(findUser);
     const cookie = this.createCookie(tokenData);
 
-    return { cookie, findUser, token: tokenData.token };
+    return { cookie, findUser, token: tokenData };
   }
 
-  protected createToken(user: User): TokenData {
+  protected createToken(user: User): string {
     const dataStoredInToken: DataStoredInToken = { _id: user._id };
     const secretKey: string = SECRET_KEY;
-    const expiresIn: number = 60 * 60;
+    // const expiresIn: number = 60 * 60;
 
-    return { expiresIn, token: sign(dataStoredInToken, secretKey, { expiresIn }) };
+    // return { expiresIn, token: sign(dataStoredInToken, secretKey, { expiresIn }) };
+    return sign(dataStoredInToken, secretKey);
   }
 
-  protected createCookie(tokenData: TokenData): string {
-    return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}; Domain=localhost; SameSite=None; Secure; Path=/;`;
+  protected createCookie(tokenData: string): string {
+    // return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}; Domain=localhost; SameSite=None; Secure; Path=/;`;
+    return `Authorization=${tokenData}; HttpOnly; Domain=localhost; SameSite=None; Secure; Path=/;`;
   }
 }
 
