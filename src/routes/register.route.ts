@@ -18,6 +18,7 @@ class RegisterRoute implements Routes {
   }
 
   private initializeRoutes() {
+    this.router.get(`${this.path}/status/:status`, authMiddleware, this.registerController.showApplicantsByStatus);
     this.router.post(`${this.path}`, this.uploadMiddleware, this.registerController.applyMembership);
     this.router.put(`${this.path}/approve/:memberShipID`, authMiddleware, this.registerController.approvedMembership);
     this.router.put(`${this.path}/decline/:memberShipID`, authMiddleware, this.registerController.declineMembership);

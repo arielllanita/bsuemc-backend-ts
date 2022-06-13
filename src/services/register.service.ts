@@ -20,26 +20,29 @@ class RegisterService {
     const hashedPassword = await hash(plainPassword, 9);
     const userCredentials = await userModel.create({ ...currentData, role: 'member', password: hashedPassword });
 
-    await sendEmail({
-      recipientEmail: user.email,
-      subject: 'Membership status 📣',
-      text: `Good day! We would like to inform you that your membership application at BSU EMC was approved and you can avail our loan offers by using your account. Below are your account credentials, please do not share them with anyone.\n\nUsername: ${user.email}\nPassword: ${plainPassword}\n\n\n-- The Management.`,
-    });
+    // await sendEmail({
+    //   recipientEmail: user.email,
+    //   subject: 'Membership status 📣',
+    //   text: `Good day! We would like to inform you that your membership application at BSU EMC was approved and you can avail our loan offers by using your account. Below are your account credentials, please do not share them with anyone.\n\nUsername: ${user.email}\nPassword: ${plainPassword}\n\n\n-- The Management.`,
+    // });
 
     return userCredentials;
   }
 
-  public async decline_membership(memberShipID: string, message: string, officer: any) {
+  public async decline_membership(memberShipID: string, message: string | any, officer: any) {
     const user = await registerModel.findById(memberShipID).lean();
     if (!user) throw new HttpException(400, 'Invalid Membership ID.');
 
-    const status = await registerModel.findByIdAndUpdate(memberShipID, { $set: { status: 'Decline', transact_by: officer } });
+    const inCharge = await userModel.findById(officer).select('firstname lastname').lean();
+    if (!inCharge) throw new HttpException(400, 'Invalid Officer ID');
 
-    await sendEmail({
-      recipientEmail: user.email,
-      subject: 'Membership status 📣',
-      text: `${message}\n\n\n-- The Management.`,
-    });
+    const status = await registerModel.findByIdAndUpdate(memberShipID, { $set: { status: 'Declined', transact_by: officer } });
+
+    // await sendEmail({
+    //   recipientEmail: user.email,
+    //   subject: 'Membership status 📣',
+    //   text: `Good day! We are sorry to inform you that your membership application at BSU EMC was declined. Below are the additional information about your request.\n\nOfficer in charge: ${inCharge.firstname} ${inCharge.lastname}\nMessage: ${message}\n\n\n-- The Management.`,
+    // });
 
     return status;
   }
@@ -58,6 +61,12 @@ class RegisterService {
     const doc = await registerModel.create({ ...data, docs });
 
     return doc;
+  }
+
+  public async show_applicants_by_status(status = 'Pending') {
+    const applicants = await registerModel.find({ status }).lean();
+
+    return applicants;
   }
 }
 

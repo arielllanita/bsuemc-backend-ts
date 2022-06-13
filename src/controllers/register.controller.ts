@@ -21,10 +21,12 @@ class RegisterController {
     try {
       const officerInCharge = req.user._id;
       const memberShipID = req.params.memberShipID;
-      const message = req.body.message;
+      const message = req.query?.message;
+
       const status = await this.registerService.decline_membership(memberShipID, message, officerInCharge);
 
       res.status(200).json({ data: status, message: 'Membership succesfully declined!' });
+      res.json(message);
     } catch (error) {
       next(error);
     }
@@ -38,6 +40,17 @@ class RegisterController {
       const doc = await this.registerService.apply_membership({ ...data, profile_photo }, files);
 
       res.status(201).json({ data: doc, message: 'Membership application sent succesfully!' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public showApplicantsByStatus: RequestHandler = async (req, res, next) => {
+    try {
+      const status = req.params.status;
+      const applicants = await this.registerService.show_applicants_by_status(status);
+
+      res.status(200).json({ data: applicants, message: 'Filter applicants by status' });
     } catch (error) {
       next(error);
     }
