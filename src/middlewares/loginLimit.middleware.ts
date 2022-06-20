@@ -17,7 +17,7 @@ const rateLimitedHander: RateLimitExceededEventHandler = async (req, res, next, 
         text: `We have detected 5 login attempts to your account today (${format(
           new Date(),
           'MMM dd, yyyy hh:mm aaa',
-        )}) for your security we temporarily locked your account.\n\n\n- The Management.`,
+        )}) for your security we temporarily locked your account.\n\n\n-- The Management.`,
       });
     }
 

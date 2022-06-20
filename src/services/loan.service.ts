@@ -1,7 +1,10 @@
 import { HttpException } from '@/exceptions/HttpException';
 import loanModel from '@/models/loan.model';
 import userModel from '@/models/users.model';
+import { firstDateOfWeek } from '@/utils/date';
 import { sendEmail } from '@/utils/mailer';
+import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
+import { PipelineStage } from 'mongoose';
 // import { Loan } from '@interfaces/loan.interface';
 
 class LoanService {
@@ -22,7 +25,7 @@ class LoanService {
           _id: '$type',
           total: { $count: {} },
           label: { $first: '$label' },
-          applicant: { $push: '$applicant' },
+          applicant: { $push: '$$ROOT' },
         },
       },
     ]);
@@ -30,8 +33,8 @@ class LoanService {
     return rejectedLoans;
   }
 
-  public async show_approved_loans() {
-    const approvedLoans = await loanModel.aggregate([
+  public async show_approved_loans(weekFilter?: string | any, monthFilter?: string | any) {
+    const pipeline: PipelineStage[] = [
       { $match: { isPending: false, isApproved: true } },
       {
         $lookup: {
@@ -41,21 +44,46 @@ class LoanService {
           as: 'applicant',
         },
       },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'transactBy',
+          foreignField: '_id',
+          as: 'officer_in_charge',
+        },
+      },
       { $unwind: '$applicant' },
+      { $unwind: '$officer_in_charge' },
       {
         $group: {
           _id: '$type',
           total: { $count: {} },
           label: { $first: '$label' },
-          applicant: { $push: '$applicant' },
+          applicant: { $push: '$$ROOT' },
         },
       },
-    ]);
+    ];
+
+    if (weekFilter || monthFilter) {
+      const filter = weekFilter?.split('W');
+      const weekNum = weekFilter ? filter[1] : null;
+      const year = weekFilter ? filter[0].slice(0, filter[0].length - 1) : null;
+      pipeline.splice(5, 0, {
+        $match: {
+          createdAt: {
+            $gte: weekFilter ? startOfWeek(firstDateOfWeek(+weekNum, +year)) : startOfMonth(new Date(monthFilter)),
+            $lte: weekFilter ? endOfWeek(firstDateOfWeek(+weekNum, +year)) : endOfMonth(new Date(monthFilter)),
+          },
+        },
+      });
+    }
+
+    const approvedLoans = await loanModel.aggregate(pipeline);
 
     return approvedLoans;
   }
 
-  public async apply_loan(files: any, texts: any) {
+  public async apply_loan(files: Express.Multer.File[], texts: any) {
     const docs = [];
     files.forEach(element => {
       const file = {
@@ -71,26 +99,58 @@ class LoanService {
     return doc;
   }
 
-  public async approve_loan(loanID: string, officerID: string | any) {
-    const doc = await loanModel.findByIdAndUpdate(loanID, { $set: { isApproved: true, isPending: false, transactBy: officerID } });
+  public async approve_loan(loanID: string, officerID: string | any, additionalInfo: any) {
+    const doc = await loanModel.findByIdAndUpdate(
+      loanID,
+      {
+        $set: {
+          isApproved: true,
+          isPending: false,
+          transactBy: officerID,
+          additioinalInfo: {
+            effective_date: new Date(),
+            installment_amount: +additionalInfo?.installment_amount,
+            first_due_date: new Date(additionalInfo?.first_due_dat),
+            last_due_date: new Date(additionalInfo?.last_due_date),
+            message: additionalInfo?.message || '',
+          },
+        },
+      },
+      { new: true },
+    );
     if (!doc) throw new HttpException(409, 'Invalid Loan ID');
 
-    const user = await userModel.findById(doc.applicant).select('email');
-    sendEmail({
-      recipientEmail: user.email,
-      subject: 'Loan Approval 🎉',
-      text: `Good day we would like to inform you that your loan applicantion for ${doc.label} was successfully approved. \n\n- The Management`,
-    })
-      .then(() => {
-        return doc;
-      })
-      .catch(err => {
-        throw new HttpException(500, err?.message || 'Error occurred while sending email.');
-      });
+    const inCharge = await userModel.findById(officerID).select('firstname lastname').lean();
+    if (!inCharge) throw new HttpException(400, 'Invalid Officer ID');
+
+    // const user = await userModel.findById(doc.applicant).select('email');
+    // await sendEmail({
+    //   recipientEmail: user.email,
+    //   subject: 'Loan Approval 🎉',
+    //   text: `Good day! We would like to inform you that your loan applicantion for ${
+    //     doc.label
+    //   } was successfully approved. Below are the additional informatin of the transaction\n\nOfficer in-charge: ${inCharge.firstname} ${
+    //     inCharge.lastname
+    //   }\nMessage: ${additionalInfo?.message || ''}\n\n\n-- The Management`,
+    // });
+
+    return doc;
   }
 
-  public async reject_loan(loanID: string, officerID: string | any) {
+  public async reject_loan(loanID: string, officerID: string | any, message: string | any) {
     const doc = await loanModel.findByIdAndUpdate(loanID, { $set: { isApproved: false, isPending: false, transactBy: officerID } });
+    if (!doc) throw new HttpException(409, 'Invalid Loan ID');
+
+    const inCharge = await userModel.findById(officerID).select('firstname lastname').lean();
+    if (!inCharge) throw new HttpException(400, 'Invalid Officer ID');
+
+    // const user = await userModel.findById(doc.applicant).select('email');
+    // await sendEmail({
+    //   recipientEmail: user.email,
+    //   subject: 'Loan Status 📣',
+    //   text: `Good day! We are sorry inform you that your loan application for ${doc.label} was declined. Below are the details of your request.\n\nOfficer in-charge: ${inCharge.firstname} ${inCharge.lastname}\nMessage: ${message}\n\n\n-- The Management`,
+    // });
+
     return doc;
   }
 

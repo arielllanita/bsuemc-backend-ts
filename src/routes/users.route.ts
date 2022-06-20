@@ -4,7 +4,7 @@ import { UserDto } from '@dtos/users.dto';
 import { Routes } from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import authMiddleware from '@/middlewares/auth.middleware';
-import { uploadProfilePhoto } from '@/utils/uploadProfilePhoto';
+// import { uploadProfilePhoto } from '@/utils/uploadProfilePhoto';
 
 class UsersRoute implements Routes {
   public readonly path = '/users';
@@ -13,7 +13,7 @@ class UsersRoute implements Routes {
   public authAndValidateMiddleware: any[] = [
     authMiddleware,
     validationMiddleware(UserDto, 'body', true, false, false),
-    uploadProfilePhoto.single('profile_photo'),
+    // uploadProfilePhoto.single('profile_photo'),
   ];
 
   constructor() {
@@ -24,8 +24,8 @@ class UsersRoute implements Routes {
     this.router.get(`${this.path}`, authMiddleware, this.usersController.getUsers);
     this.router.get(`${this.path}/:id`, authMiddleware, this.usersController.getUserById);
     this.router.get(`${this.path}/:role/role`, authMiddleware, this.usersController.getUserByRole);
-    this.router.post(`${this.path}`, this.authAndValidateMiddleware, this.usersController.createUser);
-    this.router.put(`${this.path}/:id`, this.authAndValidateMiddleware, this.usersController.updateUser);
+    // this.router.post(`${this.path}`, this.authAndValidateMiddleware, this.usersController.createUser);
+    this.router.put(`${this.path}/:id`, authMiddleware, this.usersController.updateUser);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.usersController.deleteUser);
     this.router.put(`${this.path}/activate/:id`, authMiddleware, this.usersController.re_activate_user);
   }

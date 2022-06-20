@@ -15,10 +15,13 @@ class RegisterService {
 
     await registerModel.findByIdAndUpdate(memberShipID, { $set: { status: 'Approved', transact_by: officer } });
 
-    const currentData = (({ _id, docs, status, transact_by, ...rest }) => rest)(user);
+    const currentData = (({ _id, status, ...rest }) => rest)(user);
     const plainPassword = randomBytes(6).toString('hex');
+    // const plainPassword = 'password';
     const hashedPassword = await hash(plainPassword, 9);
-    const userCredentials = await userModel.create({ ...currentData, role: 'member', password: hashedPassword });
+    console.log('CURRENT DATA', currentData?.docs);
+
+    const userCredentials = await userModel.create({ ...currentData, role: 'member', password: hashedPassword, transact_by: officer });
 
     // await sendEmail({
     //   recipientEmail: user.email,

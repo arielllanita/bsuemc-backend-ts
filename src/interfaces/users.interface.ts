@@ -7,6 +7,8 @@ export interface User {
   email: string;
   password: string;
   isDeactivated: boolean;
+  transact_by: Types.ObjectId | string;
+  docs: any[];
   role: 'member' | 'admin' | 'staff';
   school_id?: string; // Include if role is member or staff
   birthday: Date;

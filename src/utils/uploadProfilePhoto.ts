@@ -1,13 +1,11 @@
 import multer from 'multer';
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/profile_photos');
-  },
+  destination: 'uploads/profile_photos',
   filename: (req, file, cb) => {
-    const userID = req.params.id;
-    const fileName = file.originalname;
-    cb(null, `${userID}-${fileName}`);
+    const user = req.params.id || req.body.email;
+    const fileName = file.originalname.replace(/ /g, '-');
+    cb(null, `${user}-${fileName}`);
   },
 });
 

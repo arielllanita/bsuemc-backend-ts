@@ -18,7 +18,9 @@ class LoanController {
 
   public showApprovedLoans: RequestHandler = async (req, res, next) => {
     try {
-      const approvedLoans = await this.loanService.show_approved_loans();
+      const { weekFilter, monthFilter } = req.query;
+      const approvedLoans = await this.loanService.show_approved_loans(weekFilter, monthFilter);
+
       res.status(200).json({ data: approvedLoans, message: 'List of approved loans' });
     } catch (error) {
       next(error);
@@ -50,7 +52,8 @@ class LoanController {
     try {
       const loanID = req.params.id;
       const officerID = req.user._id;
-      await this.loanService.approve_loan(loanID, officerID);
+      const additionalInfo = req.body;
+      await this.loanService.approve_loan(loanID, officerID, additionalInfo);
 
       res.status(200).json({ message: 'Loan application successfully approved.' });
     } catch (error) {
@@ -62,7 +65,8 @@ class LoanController {
     try {
       const loanID = req.params.id;
       const officerID = req.user._id;
-      await this.loanService.reject_loan(loanID, officerID);
+      const message = req.query?.message;
+      await this.loanService.reject_loan(loanID, officerID, message);
 
       res.status(200).json({ message: 'Loan application successfully rejected.' });
     } catch (error) {

@@ -24,7 +24,7 @@ class UserService {
   public async findUserByRole(role: string): Promise<User[]> {
     if (isEmpty(role)) throw new HttpException(400, 'Invalid role');
 
-    const users: LeanDocument<User[]> = await userModel.find({ role, isDeactivated: false }).lean();
+    const users: LeanDocument<User[]> = await userModel.find({ role, isDeactivated: false }).populate('transact_by').lean();
     return users;
   }
 
@@ -41,19 +41,24 @@ class UserService {
   }
 
   public async updateUser(userId: string, userData: UserDto): Promise<User> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
+    const data = { ...userData };
 
-    if (userData.email) {
+    // Remove empty values
+    Object.keys(data).forEach(v => {
+      if (isEmpty(data[v])) delete data[v];
+    });
+
+    if (data?.email) {
       const findUser: LeanDocument<User> = await userModel.findOne({ email: userData.email }).lean();
-      if (findUser && findUser._id != userId) throw new HttpException(409, `You're email ${userData.email} already exists`);
+      if (findUser && findUser._id != userId) throw new HttpException(409, `Email ${userData.email} already exists`);
     }
 
-    if (!isEmpty(userData.password)) {
-      const hashedPassword = await hash(userData.password, 10);
-      userData = { ...userData, password: hashedPassword };
+    if (!isEmpty(data?.password)) {
+      const hashedPassword = await hash(data.password, 10);
+      data.password = hashedPassword;
     }
 
-    const updateUserById: LeanDocument<User> = await userModel.findByIdAndUpdate(userId, { $set: { ...userData } }).lean();
+    const updateUserById: LeanDocument<User> = await userModel.findByIdAndUpdate(userId, { $set: { ...data } }).lean();
     if (!updateUserById) throw new HttpException(409, "You're not user");
 
     return updateUserById;

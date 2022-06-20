@@ -1,7 +1,12 @@
 import { Form } from '@/interfaces/form.interface';
 import formModel from '@/models/form.model';
+import JSZip from 'jszip';
+import path from 'path';
+import * as fsAsync from 'fs/promises';
 
 class FormService {
+  public readonly zip = new JSZip();
+
   public async add_form(formPath: any, type: string): Promise<Form> {
     const docs = [];
     formPath.forEach(v => {
@@ -38,10 +43,21 @@ class FormService {
     return forms;
   }
 
-  public async show_form_by_type(formType: string): Promise<Form> {
+  // public async show_form_by_type(formType: string): Promise<Form> {
+  public async show_form_by_type(formType: string) {
     const forms = await formModel.findOne({ type: formType });
 
-    return forms;
+    await Promise.all(
+      forms.docs.map(async doc => {
+        const dir = path.join(__dirname, '../../', doc['filePath']);
+        const content = await fsAsync.readFile(dir);
+        this.zip.file(doc['fileName'], content);
+      }),
+    );
+
+    const base64 = await this.zip.generateAsync({ type: 'base64' });
+
+    return 'data:application/zip;base64,' + base64;
   }
 }
 

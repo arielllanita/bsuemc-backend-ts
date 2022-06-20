@@ -27,5 +27,5 @@ export const SECRET_KEY = 'technogeekssecretkeyforjwt';
 export const NODE_ENV = isProduction ? 'production' : 'development';
 
 // GMAIL (inser gmail account here)
-export const GMAIL = '';
-export const GMAIL_PASSWORD = ''; // App Password here
+export const GMAIL = 'llanitaariel@gmail.com';
+export const GMAIL_PASSWORD = 'svtbqahkasnqyfzb'; // App Password here

@@ -9,6 +9,9 @@ const userSchema = new Schema<User>(
     password: { type: String, required: [true, 'Password is required'] },
     isDeactivated: { type: Boolean, default: false },
 
+    transact_by: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    docs: [],
+
     role: { type: String, required: [true, 'Role is required'], enum: ['member', 'admin', 'staff'] },
     school_id: { type: String, required: [true, 'School id is required'], unique: true },
 
