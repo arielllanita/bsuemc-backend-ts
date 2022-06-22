@@ -27,6 +27,20 @@ class LoanController {
     }
   };
 
+  /**
+   * Can be use to retrieve non-pending loans (for all members) and active loans for a specific member
+   */
+  public showNonPendingLoans: RequestHandler = async (req, res, next) => {
+    try {
+      const options = req.query || {};
+      const loans = await this.loanService.show_non_pending_loans(options);
+
+      res.status(200).json({ data: loans, message: 'Non pending loans' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public showPendingLoans: RequestHandler = async (req, res, next) => {
     try {
       const loans = await loanModel.find({ isPending: true }).populate('applicant').lean();
@@ -69,6 +83,17 @@ class LoanController {
       await this.loanService.reject_loan(loanID, officerID, message);
 
       res.status(200).json({ message: 'Loan application successfully rejected.' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public showLoanHistory: RequestHandler = async (req, res, next) => {
+    try {
+      const applicantID = req.params?.applicantID;
+      const history = await this.loanService.show_loan_history(applicantID);
+
+      res.status(200).json({ data: history, message: 'Loan history' });
     } catch (error) {
       next(error);
     }

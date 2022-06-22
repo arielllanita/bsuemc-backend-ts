@@ -83,6 +83,12 @@ class LoanService {
     return approvedLoans;
   }
 
+  public async show_non_pending_loans(options = {}) {
+    const loans = await loanModel.find({ isPending: false, ...options }).lean();
+
+    return loans;
+  }
+
   public async apply_loan(files: Express.Multer.File[], texts: any) {
     const docs = [];
     files.forEach(element => {
@@ -152,6 +158,12 @@ class LoanService {
     // });
 
     return doc;
+  }
+
+  public async show_loan_history(applicantID: string | any) {
+    const transactions = await loanModel.find({ applicant: applicantID, isPending: false }).sort({ createdAt: 'asc' });
+
+    return transactions;
   }
 
   public fileSizeFormatter = (bytes: number, decimal: number) => {

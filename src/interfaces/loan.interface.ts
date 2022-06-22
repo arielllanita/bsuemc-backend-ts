@@ -11,4 +11,5 @@ export interface Loan {
   isPending: boolean;
   additioinalInfo: any;
   transactBy: string | Types.ObjectId;
+  status: string;
 }
