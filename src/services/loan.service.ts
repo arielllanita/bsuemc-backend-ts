@@ -1,10 +1,11 @@
 import { HttpException } from '@/exceptions/HttpException';
+import { Loan } from '@/interfaces/loan.interface';
 import loanModel from '@/models/loan.model';
 import userModel from '@/models/users.model';
 import { firstDateOfWeek } from '@/utils/date';
 import { sendEmail } from '@/utils/mailer';
 import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
-import { PipelineStage } from 'mongoose';
+import { PipelineStage, FilterQuery } from 'mongoose';
 // import { Loan } from '@interfaces/loan.interface';
 
 class LoanService {
@@ -84,7 +85,10 @@ class LoanService {
   }
 
   public async show_non_pending_loans(options = {}) {
-    const loans = await loanModel.find({ isPending: false, ...options }).lean();
+    const loans = await loanModel
+      .find({ isPending: false, ...options })
+      .populate('transactBy')
+      .lean();
 
     return loans;
   }
@@ -144,7 +148,15 @@ class LoanService {
   }
 
   public async reject_loan(loanID: string, officerID: string | any, message: string | any) {
-    const doc = await loanModel.findByIdAndUpdate(loanID, { $set: { isApproved: false, isPending: false, transactBy: officerID } });
+    const doc = await loanModel.findByIdAndUpdate(loanID, {
+      $set: {
+        isApproved: false,
+        isPending: false,
+        transactBy: officerID,
+        status: 'rejected',
+        additioinalInfo: { effective_date: new Date(), message },
+      },
+    });
     if (!doc) throw new HttpException(409, 'Invalid Loan ID');
 
     const inCharge = await userModel.findById(officerID).select('firstname lastname').lean();
@@ -160,8 +172,12 @@ class LoanService {
     return doc;
   }
 
-  public async show_loan_history(applicantID: string | any) {
-    const transactions = await loanModel.find({ applicant: applicantID, isPending: false }).sort({ createdAt: 'asc' });
+  public async show_loan_history(applicantID: string | any, month: any) {
+    const query: FilterQuery<Loan> = { applicant: applicantID, isPending: false };
+    if (month) {
+      query.createdAt = { $gte: startOfMonth(new Date(month)), $lte: endOfMonth(new Date(month)) };
+    }
+    const transactions = await loanModel.find(query).populate('transactBy').sort({ createdAt: 'asc' });
 
     return transactions;
   }

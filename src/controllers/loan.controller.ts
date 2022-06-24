@@ -3,6 +3,7 @@ import { RequestWithUser } from '@/interfaces/auth.interface';
 import loanModel from '@/models/loan.model';
 import LoanService from '@/services/loan.service';
 import { RequestHandler } from 'express';
+import { isEmpty } from '@utils/util';
 
 class LoanController {
   public readonly loanService = new LoanService();
@@ -43,7 +44,11 @@ class LoanController {
 
   public showPendingLoans: RequestHandler = async (req, res, next) => {
     try {
-      const loans = await loanModel.find({ isPending: true }).populate('applicant').lean();
+      const options = isEmpty(req.query) || {};
+      const loans = await loanModel
+        .find({ isPending: true, ...options })
+        .populate('applicant')
+        .lean();
       res.status(200).json({ data: loans, message: 'List of all pending loans' });
     } catch (error) {
       next(error);
@@ -91,7 +96,8 @@ class LoanController {
   public showLoanHistory: RequestHandler = async (req, res, next) => {
     try {
       const applicantID = req.params?.applicantID;
-      const history = await this.loanService.show_loan_history(applicantID);
+      const month = req.query?.month;
+      const history = await this.loanService.show_loan_history(applicantID, month);
 
       res.status(200).json({ data: history, message: 'Loan history' });
     } catch (error) {
