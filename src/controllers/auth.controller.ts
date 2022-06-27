@@ -29,7 +29,7 @@ class AuthController {
     try {
       // const frontendUrl = new URL(CORS_CONFIG.origin as string);
       // const domainName = frontendUrl.hostname.replace(/^[^.]+\./g, '');
-      res.setHeader('Set-Cookie', [`Authorization=; Max-age=0; Domain=herokuapp.com; SameSite=None; Secure; Path=/;`]);
+      res.setHeader('Set-Cookie', [`Authorization=; Max-age=0; Domain=.herokuapp.com; SameSite=None; Secure; Path=/;`]);
 
       res.status(200).json({ message: 'Logout successfully' });
     } catch (error) {
