@@ -8,7 +8,8 @@ class FormController {
   public addForm: RequestHandler = async (req, res, next) => {
     try {
       const formType = req.body.type;
-      const formPath: any = req.files;
+      // const formPath: any = req.files;
+      const formPath = req.files['form'];
       const form = await this.formService.add_form(formPath, formType);
 
       res.status(201).json({ data: form, message: 'Form added successfully!' });
@@ -20,7 +21,8 @@ class FormController {
 
   public updateForm: RequestHandler = async (req, res, next) => {
     try {
-      const updateObj = req.files;
+      // const updateObj = req.files;
+      const updateObj = req.files['form'];
       const formID = req.params.id;
       const form = await this.formService.update_form(formID, updateObj);
 

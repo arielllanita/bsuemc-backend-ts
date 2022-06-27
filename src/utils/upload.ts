@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     const dir =
       file.fieldname === 'profile_photo' // For uploading profile photo
         ? 'uploads/profile_photos'
-        : file.fieldname === 'forms' // For form uploading
+        : file.fieldname === 'forms' || file.fieldname === 'form' // For form uploading
         ? 'uploads/forms'
         : file.fieldname === 'docs' // For uploading loan documents (loan application)
         ? path.join('uploads/docs/', req.body.type)
@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-    if (file.fieldname === 'forms') {
+    if (file.fieldname === 'forms' || file.fieldname === 'form') {
       // For form uploading
       const formType = req.body.type;
       const fileName = file.originalname.replace(/ /g, '-');
@@ -32,7 +32,8 @@ const storage = multer.diskStorage({
       // For uploading profile photos
       const fileName = file.originalname.replace(/ /g, '-');
       cb(null, `${uuidv4()}-${fileName}`);
-    } else {
+    } 
+    if (file.fieldname === 'docs') {
       // For uploading loan documents (loan application)
       const fileName = file.originalname.replace(/ /g, '-');
       cb(null, `${uuidv4()}-${fileName}`);

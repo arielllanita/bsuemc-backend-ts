@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { Routes } from '@interfaces/routes.interface';
 import authMiddleware from '@middlewares/auth.middleware';
 import FormController from '@/controllers/form.controller';
-import { uploadForms } from '@/utils/uploadForms';
+// import { uploadForms } from '@/utils/uploadForms';
+import { upload } from '@/utils/upload';
 
 class FormRoute implements Routes {
   public path = '/form';
@@ -14,8 +15,8 @@ class FormRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.post(`${this.path}`, authMiddleware, uploadForms.array('form'), this.formController.addForm);
-    this.router.put(`${this.path}/:id`, authMiddleware, uploadForms.array('form'), this.formController.updateForm);
+    this.router.post(`${this.path}`, authMiddleware, upload.fields([{ name: 'form' }]), this.formController.addForm);
+    this.router.put(`${this.path}/:id`, authMiddleware, upload.fields([{ name: 'form' }]), this.formController.updateForm);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.formController.removeForm);
     this.router.get(`${this.path}/show`, authMiddleware, this.formController.showAllForm);
     this.router.get(`${this.path}/type/:type`, this.formController.showFormByType);

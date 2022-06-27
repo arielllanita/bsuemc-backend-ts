@@ -57,7 +57,8 @@ class LoanController {
 
   public applyLoan: RequestHandler = async (req, res, next) => {
     try {
-      const files: any = req.files;
+      // const files: any = req.files;
+      const files = req.files['docs'];
       const texts: string = req.body;
       await this.loanService.apply_loan(files, texts);
 
