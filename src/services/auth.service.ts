@@ -1,13 +1,12 @@
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
-import { CORS_CONFIG, isProduction, SECRET_KEY } from '@config';
+import {  SECRET_KEY } from '@config';
 import { HttpException } from '@exceptions/HttpException';
 import { DataStoredInToken } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import userModel from '@models/users.model';
 import { isEmpty } from '@utils/util';
 import { LeanDocument } from 'mongoose';
-import { LoginDto } from '@/dtos/auth.dto';
 import codesModel from '@/models/codes.model';
 
 class AuthService {
@@ -44,17 +43,12 @@ class AuthService {
   protected createToken(user: User): string {
     const dataStoredInToken: DataStoredInToken = { _id: user._id };
     const secretKey: string = SECRET_KEY;
-    // const expiresIn: number = 60 * 60;
-
-    // return { expiresIn, token: sign(dataStoredInToken, secretKey, { expiresIn }) };
+    
     return sign(dataStoredInToken, secretKey);
   }
 
   protected createCookie(tokenData: string): string {
-    // const frontendUrl = new URL(CORS_CONFIG.origin as string);
-    // const domainName = frontendUrl.hostname.replace(/^[^.]+\./g, '');
-
-    return `Authorization=${tokenData}; HttpOnly; Secure; Path=/;`;
+    return `Authorization=${tokenData}; HttpOnly; SameSite=None; Secure; Path=/;`;
   }
 }
 

@@ -5,7 +5,6 @@ import AuthService from '@services/auth.service';
 import { LoginDto } from '@/dtos/auth.dto';
 import { loginLimit } from '@/middlewares/loginLimit.middleware';
 import codesModel from '@/models/codes.model';
-import { CORS_CONFIG } from '@/config';
 
 class AuthController {
   public readonly authService = new AuthService();
@@ -27,9 +26,7 @@ class AuthController {
 
   public logOut: RequestHandler = async (req, res, next) => {
     try {
-      // const frontendUrl = new URL(CORS_CONFIG.origin as string);
-      // const domainName = frontendUrl.hostname.replace(/^[^.]+\./g, '');
-      res.setHeader('Set-Cookie', [`Authorization=; Max-age=0; HttpOnly; Secure; Path=/;`]);
+      res.setHeader('Set-Cookie', [`Authorization=; Max-age=0; HttpOnly; SameSite=None; Secure; Path=/;`]);
 
       res.status(200).json({ message: 'Logout successfully' });
     } catch (error) {
