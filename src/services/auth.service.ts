@@ -51,10 +51,10 @@ class AuthService {
   }
 
   protected createCookie(tokenData: string): string {
-    const frontendUrl = new URL(CORS_CONFIG.origin as string);
-    const domainName = frontendUrl.hostname.replace(/^[^.]+\./g, '');
+    // const frontendUrl = new URL(CORS_CONFIG.origin as string);
+    // const domainName = frontendUrl.hostname.replace(/^[^.]+\./g, '');
 
-    return `Authorization=${tokenData}; HttpOnly; Domain=${domainName}; SameSite=None; Secure; Path=/;`;
+    return `Authorization=${tokenData}; HttpOnly; Domain=herokuapp.com; SameSite=None; Secure; Path=/;`;
   }
 }
 
