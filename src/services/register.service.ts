@@ -23,11 +23,11 @@ class RegisterService {
 
     const userCredentials = await userModel.create({ ...currentData, role: 'member', password: hashedPassword, transact_by: officer });
 
-    // await sendEmail({
-    //   recipientEmail: user.email,
-    //   subject: 'Membership status 📣',
-    //   text: `Good day! We would like to inform you that your membership application at BSU EMC was approved and you can avail our loan offers by using your account. Below are your account credentials, please do not share them with anyone.\n\nUsername: ${user.email}\nPassword: ${plainPassword}\n\n\n-- The Management.`,
-    // });
+    await sendEmail({
+      recipientEmail: user.email,
+      subject: 'Membership status 📣',
+      text: `Good day! We would like to inform you that your membership application at BSU EMC was approved and you can avail our loan offers by using your account. Below are your account credentials, please do not share them with anyone.\n\nUsername: ${user.email}\nPassword: ${plainPassword}\n\n\n-- The Management.`,
+    });
 
     return userCredentials;
   }
@@ -41,11 +41,11 @@ class RegisterService {
 
     const status = await registerModel.findByIdAndUpdate(memberShipID, { $set: { status: 'Declined', transact_by: officer } });
 
-    // await sendEmail({
-    //   recipientEmail: user.email,
-    //   subject: 'Membership status 📣',
-    //   text: `Good day! We are sorry to inform you that your membership application at BSU EMC was declined. Below are the additional information about your request.\n\nOfficer in charge: ${inCharge.firstname} ${inCharge.lastname}\nMessage: ${message}\n\n\n-- The Management.`,
-    // });
+    await sendEmail({
+      recipientEmail: user.email,
+      subject: 'Membership status 📣',
+      text: `Good day! We are sorry to inform you that your membership application at BSU EMC was declined. Below are the additional information about your request.\n\nOfficer in charge: ${inCharge.firstname} ${inCharge.lastname}\nMessage: ${message}\n\n\n-- The Management.`,
+    });
 
     return status;
   }

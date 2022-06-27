@@ -133,16 +133,16 @@ class LoanService {
     const inCharge = await userModel.findById(officerID).select('firstname lastname').lean();
     if (!inCharge) throw new HttpException(400, 'Invalid Officer ID');
 
-    // const user = await userModel.findById(doc.applicant).select('email');
-    // await sendEmail({
-    //   recipientEmail: user.email,
-    //   subject: 'Loan Approval 🎉',
-    //   text: `Good day! We would like to inform you that your loan applicantion for ${
-    //     doc.label
-    //   } was successfully approved. Below are the additional informatin of the transaction\n\nOfficer in-charge: ${inCharge.firstname} ${
-    //     inCharge.lastname
-    //   }\nMessage: ${additionalInfo?.message || ''}\n\n\n-- The Management`,
-    // });
+    const user = await userModel.findById(doc.applicant).select('email');
+    await sendEmail({
+      recipientEmail: user.email,
+      subject: 'Loan Approval 🎉',
+      text: `Good day! We would like to inform you that your loan applicantion for ${
+        doc.label
+      } was successfully approved. Below are the additional informatin of the transaction\n\nOfficer in-charge: ${inCharge.firstname} ${
+        inCharge.lastname
+      }\nMessage: ${additionalInfo?.message || ''}\n\n\n-- The Management`,
+    });
 
     return doc;
   }
@@ -162,12 +162,12 @@ class LoanService {
     const inCharge = await userModel.findById(officerID).select('firstname lastname').lean();
     if (!inCharge) throw new HttpException(400, 'Invalid Officer ID');
 
-    // const user = await userModel.findById(doc.applicant).select('email');
-    // await sendEmail({
-    //   recipientEmail: user.email,
-    //   subject: 'Loan Status 📣',
-    //   text: `Good day! We are sorry inform you that your loan application for ${doc.label} was declined. Below are the details of your request.\n\nOfficer in-charge: ${inCharge.firstname} ${inCharge.lastname}\nMessage: ${message}\n\n\n-- The Management`,
-    // });
+    const user = await userModel.findById(doc.applicant).select('email');
+    await sendEmail({
+      recipientEmail: user.email,
+      subject: 'Loan Status 📣',
+      text: `Good day! We are sorry inform you that your loan application for ${doc.label} was declined. Below are the details of your request.\n\nOfficer in-charge: ${inCharge.firstname} ${inCharge.lastname}\nMessage: ${message}\n\n\n-- The Management`,
+    });
 
     return doc;
   }
