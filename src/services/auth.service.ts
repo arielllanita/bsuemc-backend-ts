@@ -54,7 +54,7 @@ class AuthService {
     // const frontendUrl = new URL(CORS_CONFIG.origin as string);
     // const domainName = frontendUrl.hostname.replace(/^[^.]+\./g, '');
 
-    return `Authorization=${tokenData}; HttpOnly; Domain=herokuapp.com; SameSite=Lax; Secure; Path=/;`;
+    return `Authorization=${tokenData}; HttpOnly; Secure; Path=/;`;
   }
 }
 
