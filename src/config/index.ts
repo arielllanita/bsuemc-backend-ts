@@ -1,4 +1,6 @@
-const isProduction = process.env.NODE_ENV === 'production ';
+import { CorsOptions } from 'cors';
+
+export const isProduction = process.env.NODE_ENV === 'production ';
 
 // DATABASE
 export const DB_URI = isProduction
@@ -6,15 +8,13 @@ export const DB_URI = isProduction
   : 'mongodb://localhost:27017/bsu_emc';
 
 // CORS
-export const CORS_CONFIG = {
-  origin: isProduction ? ['https://bsuemc.netlify.app', 'https://bsuemc.herokuapp.com'] : 'http://localhost:3000',
+export const CORS_CONFIG: CorsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Accept', 'X-XSRF-TOKEN', 'X-CLIENT-REQUEST'],
   credentials: true,
   maxAge: isProduction ? 900 : 1,
+  origin: isProduction ? 'https://bsuemc.netlify.app' : 'http://localhost:3000',
 };
-export const ORIGIN = ['https://bsuemc.netlify.app', 'http://localhost:3000'];
-export const CREDENTIALS = true;
 
 // LOG
 export const LOG_FORMAT = isProduction ? 'combined' : 'dev';

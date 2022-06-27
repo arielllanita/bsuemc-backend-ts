@@ -3,11 +3,12 @@ import formModel from '@/models/form.model';
 import JSZip from 'jszip';
 import path from 'path';
 import * as fsAsync from 'fs/promises';
+import { HttpException } from '@/exceptions/HttpException';
 
 class FormService {
   public readonly zip = new JSZip();
 
-  public async add_form(formPath: any, type: string): Promise<Form> {
+  public async add_form(formPath: Express.Multer.File[], type: string): Promise<Form> {
     const docs = [];
     formPath.forEach(v => {
       const path = { fileName: v.originalname, filePath: v.path, fileType: v.mimetype };
@@ -43,9 +44,9 @@ class FormService {
     return forms;
   }
 
-  // public async show_form_by_type(formType: string): Promise<Form> {
   public async show_form_by_type(formType: string) {
-    const forms = await formModel.findOne({ type: formType });
+    const forms = await formModel.findOne({ type: formType }).lean();
+    if (!forms) throw new HttpException(400, 'Invalid form type.');
 
     await Promise.all(
       forms.docs.map(async doc => {

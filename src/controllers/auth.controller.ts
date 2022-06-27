@@ -4,6 +4,7 @@ import { User } from '@interfaces/users.interface';
 import AuthService from '@services/auth.service';
 import { LoginDto } from '@/dtos/auth.dto';
 import { loginLimit } from '@/middlewares/loginLimit.middleware';
+import codesModel from '@/models/codes.model';
 
 class AuthController {
   public readonly authService = new AuthService();
@@ -36,6 +37,17 @@ class AuthController {
     try {
       const userData: User = req.user;
       res.status(200).json({ data: userData, message: 'Verify jwt' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public unlockAccount: RequestHandler = async (req, res, next) => {
+    try {
+      const { code } = req.params;
+      await codesModel.findOneAndRemove({ code });
+      
+      res.status(200).json({ message: 'Unlock account' });
     } catch (error) {
       next(error);
     }

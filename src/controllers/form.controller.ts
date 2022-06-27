@@ -8,7 +8,7 @@ class FormController {
   public addForm: RequestHandler = async (req, res, next) => {
     try {
       const formType = req.body.type;
-      const formPath = req.files;
+      const formPath: any = req.files;
       const form = await this.formService.add_form(formPath, formType);
 
       res.status(201).json({ data: form, message: 'Form added successfully!' });

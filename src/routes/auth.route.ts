@@ -20,6 +20,7 @@ class AuthRoute implements Routes {
     this.router.post(`${this.path}/login`, this.loginMiddlewares, this.authController.logIn);
     this.router.post(`${this.path}/logout`, this.authController.logOut);
     this.router.get(`${this.path}/verify-jwt`, authMiddleware, this.authController.verifyJwt);
+    this.router.delete(`${this.path}/unlock/:code`, this.authController.unlockAccount)
   }
 }
 
