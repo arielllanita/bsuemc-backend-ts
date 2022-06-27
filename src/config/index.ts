@@ -10,11 +10,11 @@ export const DB_URI = 'mongodb+srv://ariel:26dg61cqj72V3X6i@capstone.6bmo6he.mon
 
 // CORS
 export const CORS_CONFIG: CorsOptions = {
-  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE'],
-  allowedHeaders: ['Content-Type', 'Accept', 'X-XSRF-TOKEN', 'X-CLIENT-REQUEST'],
-  credentials: true,
-  maxAge: isProduction ? 900 : 1,
   origin: isProduction ? 'https://bsuemc.netlify.app' : 'http://localhost:3000',
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE'],
+  allowedHeaders: ['Content-Type', 'Accept', 'X-XSRF-TOKEN', 'X-CLIENT-REQUEST', 'Authorization'],
+  credentials: true,
+  // maxAge: isProduction ? 900 : 1,
 };
 
 // LOG
