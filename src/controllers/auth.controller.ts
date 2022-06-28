@@ -42,17 +42,6 @@ class AuthController {
       next(error);
     }
   };
-
-  public unlockAccount: RequestHandler = async (req, res, next) => {
-    try {
-      const { code } = req.params;
-      await codesModel.findOneAndRemove({ code });
-
-      res.status(200).json({ message: 'Unlock account' });
-    } catch (error) {
-      next(error);
-    }
-  };
 }
 
 export default AuthController;
