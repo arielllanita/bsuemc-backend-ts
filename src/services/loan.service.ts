@@ -137,9 +137,9 @@ class LoanService {
     await sendEmail({
       recipientEmail: user.email,
       subject: 'Loan Approval 🎉',
-      text: `Good day! We would like to inform you that your loan applicantion for ${
+      text: `Good day! We would like to inform you that your loan application for ${
         doc.label
-      } was successfully approved. Below are the additional informatin of the transaction\n\nOfficer in-charge: ${inCharge.firstname} ${
+      } was successfully approved. Below are the additional information of the transaction.\n\nOfficer in-charge: ${inCharge.firstname} ${
         inCharge.lastname
       }\nMessage: ${additionalInfo?.message || ''}\n\n\n-- The Management`,
     });
