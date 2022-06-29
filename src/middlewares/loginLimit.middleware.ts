@@ -17,7 +17,8 @@ const rateLimitedHander: RateLimitExceededEventHandler = async (req, res, next, 
       
       if (!accountAlreadyLocked) {
         const code = randomBytes(3).toString('hex');
-        await codesModel.create({ user, code });
+        
+        await codesModel.create({ user, code, type: 'ACCOUNT LOCK' });
         await sendEmail({
           recipientEmail: email,
           subject: 'Security 🔐',

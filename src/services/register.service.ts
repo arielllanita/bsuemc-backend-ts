@@ -17,9 +17,7 @@ class RegisterService {
 
     const currentData = (({ _id, status, ...rest }) => rest)(user);
     const plainPassword = randomBytes(6).toString('hex');
-    // const plainPassword = 'password';
     const hashedPassword = await hash(plainPassword, 9);
-    console.log('CURRENT DATA', currentData?.docs);
 
     const userCredentials = await userModel.create({ ...currentData, role: 'member', password: hashedPassword, transact_by: officer });
 

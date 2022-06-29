@@ -9,6 +9,10 @@ import { HttpException } from '@/exceptions/HttpException';
 import userModel from '@/models/users.model';
 import { isEmpty } from '@/utils/util';
 import { add } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
+import { sendEmail } from '@/utils/mailer';
+import { CORS_CONFIG } from '@/config';
+import { hash } from 'bcrypt';
 
 class AuthController {
   public readonly authService = new AuthService();
@@ -30,8 +34,8 @@ class AuthController {
 
   public logOut: RequestHandler = async (req, res, next) => {
     try {
-      res.cookie('Authorization', '', { maxAge: 0, sameSite: 'none', secure: true, httpOnly: true })
-      
+      res.cookie('Authorization', '', { maxAge: 0, sameSite: 'none', secure: true, httpOnly: true });
+
       res.status(200).json({ message: 'Logout successfully' });
     } catch (error) {
       next(error);
@@ -50,7 +54,11 @@ class AuthController {
   public resetPassword: RequestHandler = async (req, res, next) => {
     try {
       const { password, userID } = req.body;
-      await userModel.findByIdAndUpdate(userID, { $set: { password } });
+      if (isEmpty(password)) throw new HttpException(400, 'Please provide a password');
+      if (isEmpty(userID)) throw new HttpException(400, 'Invalid Link');
+
+      const encrypted = await hash(password, 10);
+      await userModel.findByIdAndUpdate(userID, { $set: { password: encrypted } });
 
       res.sendStatus(200);
     } catch (error) {
@@ -74,12 +82,29 @@ class AuthController {
   };
 
   public createResetPwId: RequestHandler = async (req, res, next) => {
+    let codeID = null;
     try {
-      await this.authService.create_reset_pw_id(req.body?.email);
+      const email = req.body?.email;
+      if (isEmpty(email)) throw new HttpException(400, 'Please provide an email');
 
-      res.status(201).json({ message: 'Reset password ID created successfully!' });
+      const user = await userModel.findOne({ email }).lean();
+      if (!user) throw new HttpException(409, 'Invalid email');
+
+      const code = uuidv4();
+      codeID = await codesModel.create({ user: user._id, type: 'RESET PASSWORD', code });
+
+      await sendEmail({
+        recipientEmail: user.email,
+        subject: 'Reset Password 🔓',
+        text: `Good day! To reset your account's password please click the link to proceed. Please note that this link is only available for 15 mins and afterwards will be automatically invalidated.\n\n${CORS_CONFIG.origin[0]}/reset-password/${code}`,
+      });
+
+      res.status(201).json({ message: 'A link was sent to your email to reset your password.' });
     } catch (error) {
-      next(error);
+      codesModel
+        .findByIdAndRemove(codeID?._id)
+        .then(() => next(error))
+        .catch(err => next(err || error));
     }
   };
 }

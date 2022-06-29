@@ -20,6 +20,9 @@ class AuthRoute implements Routes {
     this.router.post(`${this.path}/login`, this.loginMiddlewares, this.authController.logIn);
     this.router.post(`${this.path}/logout`, this.authController.logOut);
     this.router.get(`${this.path}/verify-jwt`, authMiddleware, this.authController.verifyJwt);
+    this.router.post(`${this.path}/reset-password`, this.authController.createResetPwId);
+    this.router.delete(`${this.path}/reset-password/:code`, this.authController.verifyResetPwId);
+    this.router.put(`${this.path}/reset-password`, this.authController.resetPassword);
   }
 }
 
