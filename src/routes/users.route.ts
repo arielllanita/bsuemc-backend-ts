@@ -5,6 +5,7 @@ import { Routes } from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import authMiddleware from '@/middlewares/auth.middleware';
 // import { uploadProfilePhoto } from '@/utils/uploadProfilePhoto';
+import { upload } from '@/utils/upload';
 
 class UsersRoute implements Routes {
   public readonly path = '/users';
@@ -25,7 +26,7 @@ class UsersRoute implements Routes {
     this.router.get(`${this.path}/:id`, authMiddleware, this.usersController.getUserById);
     this.router.get(`${this.path}/:role/role`, authMiddleware, this.usersController.getUserByRole);
     // this.router.post(`${this.path}`, this.authAndValidateMiddleware, this.usersController.createUser);
-    this.router.put(`${this.path}/:id`, authMiddleware, this.usersController.updateUser);
+    this.router.put(`${this.path}/:id`, authMiddleware, upload.fields([{ name: 'profile_photo', maxCount: 1 }]), this.usersController.updateUser);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.usersController.deleteUser);
     this.router.put(`${this.path}/activate/:id`, authMiddleware, this.usersController.re_activate_user);
   }

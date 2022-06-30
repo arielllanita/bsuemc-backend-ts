@@ -69,7 +69,7 @@ class UsersController {
     try {
       const userId: string = req.params.id;
       const userData: UserDto = req.body;
-      const profile_photo = req.file?.path ? { profile_photo: req.file?.path } : {};
+      const profile_photo = req.files['profile_photo']?.length ? { profile_photo: req.files['profile_photo'][0].path } : {};
       const updateUserData: User = await this.userService.updateUser(userId, { ...userData, ...profile_photo });
 
       res.status(200).json({ data: updateUserData, message: 'updated' });

@@ -28,7 +28,6 @@ const rateLimitedHander: RateLimitExceededEventHandler = async (req, res, next, 
           )}) to help you secure your account we temporarily locked your account. 
           Enter this code ${code} to unlock your account after login.\n\n\n-- The Management.`,
         });
-        // console.log('CODE', code)
       }
     }
 
