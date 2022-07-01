@@ -56,9 +56,9 @@ class FormController {
   public showFormByType: RequestHandler = async (req, res, next) => {
     try {
       const formType = req.params.type;
-      const forms = await this.formService.show_form_by_type(formType);
+      const zipLink = await this.formService.show_form_by_type(formType);
 
-      res.status(200).json(forms);
+      res.status(200).json(zipLink);
     } catch (error) {
       next(error);
     }
