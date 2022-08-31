@@ -1,6 +1,6 @@
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
-import { CORS_CONFIG, SECRET_KEY } from '@config';
+import { CORS_CONFIG, FRONTEND, SECRET_KEY } from '@config';
 import { HttpException } from '@exceptions/HttpException';
 import { DataStoredInToken } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
@@ -52,7 +52,7 @@ class AuthService {
     await sendEmail({
       recipientEmail: user.email,
       subject: 'Reset Password 🔓',
-      text: `Good day! To reset your account's password please click the link to proceed. Please note that this link is only available for 15 mins and afterwards will be automatically invalidated.\n\n${CORS_CONFIG.origin[0]}/reset-password/${code}`
+      text: `Good day! To reset your account's password please click the link to proceed. Please note that this link is only available for 15 mins and afterwards will be automatically invalidated.\n\n${FRONTEND}/reset-password/${code}`
     });
 
     return passwordID;

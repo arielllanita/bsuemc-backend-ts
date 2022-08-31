@@ -11,7 +11,7 @@ import { isEmpty } from '@/utils/util';
 import { add } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { sendEmail } from '@/utils/mailer';
-import { CORS_CONFIG } from '@/config';
+import { CORS_CONFIG, FRONTEND } from '@/config';
 import { hash } from 'bcrypt';
 
 class AuthController {
@@ -96,7 +96,7 @@ class AuthController {
       await sendEmail({
         recipientEmail: user.email,
         subject: 'Reset Password 🔓',
-        text: `Good day! To reset your account's password please click the link to proceed. Please note that this link is only available for 15 mins and afterwards will be automatically invalidated.\n\n${CORS_CONFIG.origin[0]}/reset-password/${code}`,
+        text: `Good day! To reset your account's password please click the link to proceed. Please note that this link is only available for 15 mins and afterwards will be automatically invalidated.\n\n${FRONTEND}/reset-password/${code}`,
       });
 
       res.status(201).json({ message: 'A link was sent to your email to reset your password.' });

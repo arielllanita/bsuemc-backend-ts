@@ -1,6 +1,6 @@
 @baseURL = http://localhost:8080
 
-GET {{baseURL}}/loan/history/625826dc76726739c5cbaaff
+GET {{baseURL}}/loan/history/625826dc76726739c5cbaaff?month=2022-06
 
 ###
 GET {{baseURL}}/loan/non-pending?applicant=625826dc76726739c5cbaaff&status=active

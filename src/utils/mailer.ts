@@ -20,10 +20,10 @@ export const sendEmail = ({ recipientEmail, subject, text }) => {
       },
       err => {
         if (err) {
-          //   console.log('EMAIL ERROR', err);
+          console.log('EMAIL ERROR', err);
           reject('Problem occurred while sending email');
         } else {
-          //   console.log('EMAIL SENT SUCCESS!');
+          console.log('EMAIL SENT SUCCESS!');
           resolve('Email sent successfully!');
         }
       },
