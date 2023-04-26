@@ -133,3 +133,4 @@ dist
 uploads/
 
 test.js
+.DS_Store
