@@ -16,14 +16,11 @@ class AuthService {
     if (isEmpty(userData)) throw new HttpException(400, 'Please provide the correct data.');
 
     const validEmail: LeanDocument<User> = await userModel.findOne({ email: userData.email }).lean();
+    const validPassword: boolean = await compare(userData.password, validEmail.password);
     if (!validEmail) throw new HttpException(409, 'Invalid email');
 
-    const validPassword: boolean = await compare(userData.password, validEmail.password);
-    if (!validPassword) {
-      throw new HttpException(409, `Invalid password, ${+remainingAttempts + 1} remaining attempt(s)`);
-    }
-
     const isLockedAccount = await codesModel.exists({ user: validEmail._id, type: 'ACCOUNT LOCK' });
+
     if (isLockedAccount) {
       if (isEmpty(userData?.code)) throw new HttpException(429, 'Please provide a code');
 
@@ -32,6 +29,8 @@ class AuthService {
 
       // remove code after verification
       await codesModel.findByIdAndRemove(isLockedAccount);
+    } else if (!validPassword) {
+      throw new HttpException(409, `Invalid password, ${+remainingAttempts + 1} remaining attempt(s)`);
     }
 
     const tokenData = this.createToken(validEmail);
@@ -52,7 +51,7 @@ class AuthService {
     await sendEmail({
       recipientEmail: user.email,
       subject: 'Reset Password 🔓',
-      text: `Good day! To reset your account's password please click the link to proceed. Please note that this link is only available for 15 mins and afterwards will be automatically invalidated.\n\n${FRONTEND}/reset-password/${code}`
+      text: `Good day! To reset your account's password please click the link to proceed. Please note that this link is only available for 15 mins and afterwards will be automatically invalidated.\n\n${FRONTEND}/reset-password/${code}`,
     });
 
     return passwordID;
