@@ -1,4 +1,5 @@
 import { Register } from '@/interfaces/register.interface';
+import { capitalCase } from 'change-case';
 import { model, Schema } from 'mongoose';
 
 const registerSchema = new Schema<Register>(
@@ -25,6 +26,16 @@ const registerSchema = new Schema<Register>(
     timestamps: true,
   },
 );
+
+registerSchema.pre('save', function (next) {
+  this.firstname = capitalCase(this.firstname);
+  this.lastname = capitalCase(this.lastname);
+  this.province = capitalCase(this.province);
+  this.city = capitalCase(this.city);
+  this.barangay = capitalCase(this.barangay);
+
+  next();
+});
 
 const registerModel = model<Register>('Register', registerSchema);
 

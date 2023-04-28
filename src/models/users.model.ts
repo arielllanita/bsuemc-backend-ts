@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { User } from '@interfaces/users.interface';
+import { capitalCase } from 'change-case';
 
 const userSchema = new Schema<User>(
   {
@@ -27,6 +28,16 @@ const userSchema = new Schema<User>(
     timestamps: true,
   },
 );
+
+userSchema.pre('save', function (next) {
+  this.firstname = capitalCase(this.firstname);
+  this.lastname = capitalCase(this.lastname);
+  this.province = capitalCase(this.province);
+  this.city = capitalCase(this.city);
+  this.barangay = capitalCase(this.barangay);
+
+  next();
+});
 
 const userModel = model<User>('User', userSchema);
 
