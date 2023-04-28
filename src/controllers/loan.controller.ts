@@ -19,8 +19,10 @@ class LoanController {
 
   public showApprovedLoans: RequestHandler = async (req, res, next) => {
     try {
-      const { weekFilter, monthFilter } = req.query;
-      const approvedLoans = await this.loanService.show_approved_loans(weekFilter, monthFilter);
+      const { start, end } = req.query;
+      // console.log('QUERY', req.query);
+
+      const approvedLoans = await this.loanService.show_approved_loans(start, end);
 
       res.status(200).json({ data: approvedLoans, message: 'List of approved loans' });
     } catch (error) {

@@ -34,7 +34,7 @@ class LoanService {
     return rejectedLoans;
   }
 
-  public async show_approved_loans(weekFilter?: string | any, monthFilter?: string | any) {
+  public async show_approved_loans(start?: string | any, end?: string | any) {
     const pipeline: PipelineStage[] = [
       { $match: { isPending: false, isApproved: true } },
       {
@@ -65,19 +65,18 @@ class LoanService {
       },
     ];
 
-    if (weekFilter || monthFilter) {
-      const filter = weekFilter?.split('W');
-      const weekNum = weekFilter ? filter[1] : null;
-      const year = weekFilter ? filter[0].slice(0, filter[0].length - 1) : null;
-      pipeline.splice(5, 0, {
+    if (start || end) {
+      pipeline.splice(0, 0, {
         $match: {
           createdAt: {
-            $gte: weekFilter ? startOfWeek(firstDateOfWeek(+weekNum, +year)) : startOfMonth(new Date(monthFilter)),
-            $lte: weekFilter ? endOfWeek(firstDateOfWeek(+weekNum, +year)) : endOfMonth(new Date(monthFilter)),
+            $gte: new Date(start),
+            $lte: new Date(end),
           },
         },
       });
     }
+
+    console.log('PIPELINE', pipeline);
 
     const approvedLoans = await loanModel.aggregate(pipeline);
 
