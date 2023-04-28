@@ -14,6 +14,7 @@ import { Routes } from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
 import path from 'path';
+import restrictBrowser from '@middlewares/browser.middleware';
 
 class App {
   public app: express.Application;
@@ -54,6 +55,7 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(cors(CORS_CONFIG));
+    this.app.use(restrictBrowser);
     this.app.use(morgan(LOG_FORMAT, { stream }));
     // Document upload directory
     this.app.use('/uploads', express.static(path.join(__dirname, '../', 'uploads')));
