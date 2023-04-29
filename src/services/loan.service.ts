@@ -76,8 +76,6 @@ class LoanService {
       });
     }
 
-    console.log('PIPELINE', pipeline);
-
     const approvedLoans = await loanModel.aggregate(pipeline);
 
     return approvedLoans;
@@ -119,7 +117,7 @@ class LoanService {
           additioinalInfo: {
             effective_date: new Date(),
             installment_amount: +additionalInfo?.installment_amount,
-            first_due_date: new Date(additionalInfo?.first_due_dat),
+            first_due_date: new Date(additionalInfo?.first_due_date),
             last_due_date: new Date(additionalInfo?.last_due_date),
             message: additionalInfo?.message || '',
           },

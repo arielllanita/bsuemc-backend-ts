@@ -6,10 +6,11 @@ import { RequestHandler } from 'express';
  * so they are free to access resources.
  */
 const restrictBrowser: RequestHandler = (req, res, next) => {
-  if (req.headers['x-client-request']) {
+  if (!req.headers['x-client-request'] && req.method === 'GET') {
+    return next();
+  } else if (req.headers['x-client-request']) {
     return next();
   } else {
-    // API access from browser will be forbidden
     return res.sendStatus(403);
   }
 };

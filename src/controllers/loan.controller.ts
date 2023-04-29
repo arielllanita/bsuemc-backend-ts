@@ -4,6 +4,10 @@ import loanModel from '@/models/loan.model';
 import LoanService from '@/services/loan.service';
 import { RequestHandler } from 'express';
 import { isEmpty } from '@utils/util';
+import paymentPostingModel from '@/models/payment-posting.model';
+import { sendEmail } from '@/utils/mailer';
+import { format } from 'date-fns';
+import { HttpException } from '@/exceptions/HttpException';
 
 class LoanController {
   public readonly loanService = new LoanService();
@@ -103,6 +107,39 @@ class LoanController {
       const history = await this.loanService.show_loan_history(applicantID, month);
 
       res.status(200).json({ data: history, message: 'Loan history' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public postPayment: RequestHandler = async (req: RequestWithUser, res, next) => {
+    try {
+      const inCharge = req.user;
+      const { month, loanId, applicant, loanInfo } = req.body;
+
+      if (await paymentPostingModel.exists({ month, loanId })) {
+        throw new HttpException(400, 'Payment posting for this month was already posted.');
+      }
+
+      await paymentPostingModel.create({ postedBy: inCharge._id, month, loanId });
+      await sendEmail({
+        recipientEmail: applicant?.email,
+        subject: 'Payment Posting 📣',
+        text: `Good day! We are happy to inform you that your payment for ${loanInfo?.loan_type} for the month of ${format(
+          new Date(month),
+          'MMMM, yyyy',
+        )} was posted.\n\nOfficer in-charge: ${inCharge.firstname} ${inCharge.lastname}\n\n-- The Management`,
+      });
+      res.status(200).json({ message: 'Posted successfully!' });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  public showPostedPayment: RequestHandler = async (req, res, next) => {
+    try {
+      const data = await paymentPostingModel.find({}).sort({ createdAt: -1 }).lean();
+      res.status(200).json({ data, message: 'history' });
     } catch (error) {
       next(error);
     }
