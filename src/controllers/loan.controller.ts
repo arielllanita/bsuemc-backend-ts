@@ -138,7 +138,39 @@ class LoanController {
 
   public showPostedPayment: RequestHandler = async (req, res, next) => {
     try {
-      const data = await paymentPostingModel.find({}).sort({ createdAt: -1 }).lean();
+      const data = await loanModel.aggregate([
+        { $match: { isApproved: true } },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'transactBy',
+            foreignField: '_id',
+            as: 'transactBy',
+          },
+        },
+        { $unwind: '$transactBy' },
+        {
+          $lookup: {
+            from: 'payment_postings',
+            let: { loanId: '$_id' },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$loanId', '$$loanId'] } } },
+              {
+                $lookup: {
+                  from: 'users',
+                  localField: 'postedBy',
+                  foreignField: '_id',
+                  as: 'postedBy',
+                },
+              },
+              { $unwind: '$postedBy' },
+              { $sort: { createdAt: -1 } },
+            ],
+            as: 'payment_postings',
+          },
+        },
+        { $sort: { createdAt: -1 } },
+      ]);
       res.status(200).json({ data, message: 'history' });
     } catch (error) {
       next(error);
