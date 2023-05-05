@@ -6,7 +6,7 @@ import { RequestHandler } from 'express';
 import { isEmpty } from '@utils/util';
 import paymentPostingModel from '@/models/payment-posting.model';
 import { sendEmail } from '@/utils/mailer';
-import { format } from 'date-fns';
+import { differenceInMonths, format } from 'date-fns';
 import { HttpException } from '@/exceptions/HttpException';
 
 class LoanController {
@@ -41,8 +41,9 @@ class LoanController {
     try {
       const options = req.query || {};
       const loans = await this.loanService.show_non_pending_loans(options);
+      const payedLoans = await paymentPostingModel.find({}).lean();
 
-      res.status(200).json({ data: loans, message: 'Non pending loans' });
+      res.status(200).json({ data: loans, payedLoans, message: 'Non pending loans' });
     } catch (error) {
       next(error);
     }
@@ -120,6 +121,14 @@ class LoanController {
       if (await paymentPostingModel.exists({ month, loanId })) {
         throw new HttpException(400, 'Payment posting for this month was already posted.');
       }
+      const totalMonthsPayed = await paymentPostingModel.count({ loanId });
+      const loan = await loanModel.findById(loanId).lean();
+      const totalMonthsToPay = differenceInMonths(new Date(loan?.additioinalInfo?.last_due_date), new Date(loan?.additioinalInfo?.first_due_date));
+
+      if (totalMonthsPayed >= totalMonthsToPay) {
+        await loanModel.findByIdAndUpdate(loanId, { $set: { status: 'paid' } });
+        throw new HttpException(400, 'This loan was already payed');
+      }
 
       await paymentPostingModel.create({ postedBy: inCharge._id, month, loanId });
       await sendEmail({
@@ -130,7 +139,7 @@ class LoanController {
           'MMMM, yyyy',
         )} was posted.\n\nOfficer in-charge: ${inCharge.firstname} ${inCharge.lastname}\n\n-- The Management`,
       });
-      res.status(200).json({ message: 'Posted successfully!' });
+      res.status(200).json({ data: { totalMonthsPayed, totalMonthsToPay }, message: 'Posted successfully!' });
     } catch (err) {
       next(err);
     }
@@ -149,6 +158,15 @@ class LoanController {
           },
         },
         { $unwind: '$transactBy' },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'applicant',
+            foreignField: '_id',
+            as: 'applicant',
+          },
+        },
+        { $unwind: '$applicant' },
         {
           $lookup: {
             from: 'payment_postings',

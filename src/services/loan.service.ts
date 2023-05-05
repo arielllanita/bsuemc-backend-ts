@@ -36,7 +36,7 @@ class LoanService {
 
   public async show_approved_loans(start?: string | any, end?: string | any) {
     const pipeline: PipelineStage[] = [
-      { $match: { isPending: false, isApproved: true } },
+      { $match: { isPending: false, isApproved: true, status: 'active' } },
       {
         $lookup: {
           from: 'users',
@@ -83,7 +83,7 @@ class LoanService {
 
   public async show_non_pending_loans(options = {}) {
     const loans = await loanModel
-      .find({ isPending: false, ...options })
+      .find({ isPending: false, status: 'active', ...options })
       .populate('transactBy')
       .lean();
 
