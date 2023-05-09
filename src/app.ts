@@ -61,6 +61,7 @@ class App {
     this.app.use('/uploads', express.static(path.join(__dirname, '../', 'uploads')));
     // Enable access to JSON payload
     this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
     // Protection against HTTP Parameter Pollution attacks
     this.app.use(hpp());
     // Protection against security risks like XSS, Content Security Policy

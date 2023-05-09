@@ -49,11 +49,10 @@ class LoanController {
     }
   };
 
-  public showPendingLoans: RequestHandler = async (req, res, next) => {
+  public showPendingLoans: RequestHandler = async (req: RequestWithUser, res, next) => {
     try {
-      const options = isEmpty(req.query) || {};
       const loans = await loanModel
-        .find({ isPending: true, ...options })
+        .find({ isPending: true, ...req.query })
         .populate('applicant')
         .lean();
       res.status(200).json({ data: loans, message: 'List of all pending loans' });
